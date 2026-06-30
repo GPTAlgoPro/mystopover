@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -19,6 +19,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "龙腾出行 Stopover | AI 中转套餐与微游服务",
   description: "解决中转旅客时间、行李和体验焦虑。以机场贵宾室为信任锚，提供行李全托管、标准化城市微游和误机保障体验。",
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  interactiveWidget: 'resizes-content',
 };
 
 const preferenceBootScript = `
