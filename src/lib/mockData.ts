@@ -57,7 +57,7 @@ export const packages: Package[] = [
       '贵宾厅内洗漱淋浴与高速 Wi-Fi'
     ],
     recommendedLayover: { minHours: 4, maxHours: 8 },
-    addons: ['esim', 'meal-voucher', 'shower'],
+    addons: ['esim', 'ai-group-meal', 'meal-voucher', 'shower'],
   },
   {
     sku: 'micro',
@@ -74,7 +74,7 @@ export const packages: Package[] = [
       '中转延误/误机全面安心保障与改签协助'
     ],
     recommendedLayover: { minHours: 8, maxHours: 18 },
-    addons: ['esim', 'transfer', 'meal-voucher'],
+    addons: ['esim', 'transfer', 'ai-group-meal', 'meal-voucher'],
   },
   {
     sku: 'overnight',
@@ -90,7 +90,7 @@ export const packages: Package[] = [
       '中转延误/误机全面安心保障与改签协助'
     ],
     recommendedLayover: { minHours: 12, maxHours: 36 },
-    addons: ['esim', 'transfer', 'hotel-dayuse', 'private-car', 'meal-voucher'],
+    addons: ['esim', 'transfer', 'hotel-dayuse', 'ai-group-meal', 'private-car', 'meal-voucher'],
   },
 ];
 
@@ -122,6 +122,13 @@ export const addons: Addon[] = [
     price: 60,
     description: '非贵宾厅用户亦可凭券前往机场指定淋浴中心，享 30 分钟舒适淋浴及全套高档备品。',
     iconName: 'ShowerHead',
+  },
+  {
+    sku: 'ai-group-meal',
+    name: '龙腾 AI 停留团餐匹配',
+    price: 168,
+    description: '随票智能匹配停留时段、E/I 偏好与能量水平，生成可拼团或低打扰的机场/城市团餐方案，含餐位锁定与返场时间校验。',
+    iconName: 'Sparkles',
   },
   {
     sku: 'meal-voucher',

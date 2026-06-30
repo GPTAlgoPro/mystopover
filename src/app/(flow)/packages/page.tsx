@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOrderStore } from '@/lib/store/orderStore';
 import { packages, addons, airports } from '@/lib/mockData';
 import { PackageSku } from '@/lib/types';
 import { 
   Wifi, Car, Utensils, Compass, BedDouble, ShowerHead,
-  CheckCircle, ArrowLeft, ArrowRight, ShieldCheck 
+  CheckCircle, ArrowLeft, ArrowRight, ShieldCheck, Sparkles,
+  UsersRound, BatteryCharging, Zap, SunMedium, Moon, ChefHat,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,6 +34,8 @@ export default function PackagesPage() {
   };
 
   const recommendedSku = searchParams ? getRecommendedPackageSku(searchParams.layoverHours) : 'light';
+  const [mealPersona, setMealPersona] = useState<'E' | 'I'>('E');
+  const [mealEnergy, setMealEnergy] = useState<'high' | 'low'>('high');
 
   // If no package has been explicitly selected yet, default to the recommended one
   useEffect(() => {
@@ -41,11 +44,32 @@ export default function PackagesPage() {
     }
   }, [searchParams, selectedPackageSku, recommendedSku, selectPackage]);
 
+  const activePackage = packages.find(p => p.sku === (selectedPackageSku || recommendedSku))!;
+  const mealPeriod = useMemo(() => {
+    if (!searchParams) return 'day' as const;
+    const hour = Number(searchParams.arrivalTimeStr.slice(11, 13));
+    return Number.isFinite(hour) && (hour < 7 || hour >= 18) ? 'night' as const : 'day' as const;
+  }, [searchParams]);
+  const mealRecommendation = useMemo(() => {
+    const key = `${mealPeriod}-${mealPersona}-${mealEnergy}`;
+    const map: Record<string, { name: string; note: string; table: string; score: number }> = {
+      'day-E-high': { name: '南洋热力拼桌团餐', note: '白天高能量，适合把本地特色餐嵌入城市微游，提高停留期待感。', table: '4-6 人拼桌', score: 96 },
+      'day-E-low': { name: '轻社交早午餐会合桌', note: '保留一点社交氛围，但控制步行和等位时间。', table: '2-4 人半开放桌', score: 92 },
+      'day-I-high': { name: '静享本地探索餐', note: '小范围探索，不强制拼桌，适合想体验但不想被打扰的旅客。', table: '独立小桌', score: 93 },
+      'day-I-low': { name: '低噪补能暖食', note: '机场内完成，低移动、低决策，最适合疲惫或带娃场景。', table: '静音座位', score: 95 },
+      'night-E-high': { name: '夜航安全拼餐局', note: '夜间不拉远距离，保留同路人氛围和安全会合点。', table: '3-5 人安全拼桌', score: 94 },
+      'night-E-low': { name: '轻拼宵夜补给', note: '短时热食、低步行，降低红眼航班前的放弃率。', table: '2-3 人短时拼桌', score: 91 },
+      'night-I-high': { name: '夜间私享热食盒', note: '靠近登机动线，安静补能，随时可撤回。', table: '独立位', score: 93 },
+      'night-I-low': { name: '静音恢复热汤餐', note: '淋浴后热汤和休息区送达，核心是安全、热食、少走路。', table: '低打扰座位', score: 97 },
+    };
+    return map[key];
+  }, [mealEnergy, mealPeriod, mealPersona]);
+  const mealAddon = addons.find((item) => item.sku === 'ai-group-meal');
+  const isMealSelected = selectedAddonSkus.includes('ai-group-meal');
+
   if (!searchParams) return null;
 
   const currentAirport = airports.find(a => a.code === searchParams.airportCode)!;
-
-  const activePackage = packages.find(p => p.sku === (selectedPackageSku || recommendedSku))!;
 
   // Map icon strings to components
   const iconMap: Record<string, React.ReactNode> = {
@@ -54,6 +78,7 @@ export default function PackagesPage() {
     BedDouble: <BedDouble size={18} />,
     ShowerHead: <ShowerHead size={18} />,
     Utensils: <Utensils size={18} />,
+    Sparkles: <Sparkles size={18} />,
     Compass: <Compass size={18} />,
   };
 
@@ -151,6 +176,102 @@ export default function PackagesPage() {
               );
             })}
           </div>
+
+          {activePackage.addons.includes('ai-group-meal') && mealAddon && (
+            <div className="liquid-glass-dark relative overflow-hidden rounded-3xl p-5 text-white shadow-2xl">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200 to-transparent" />
+              <div className="grid gap-5 lg:grid-cols-[1fr_260px]">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200/35 bg-cyan-200/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">
+                      <Sparkles size={12} />
+                      龙腾出行 AI 团餐匹配
+                    </span>
+                    <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-black text-orange-100">
+                      随套餐加购 +¥{mealAddon.price}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3 text-2xl font-black tracking-normal text-white">{mealRecommendation.name}</h3>
+                  <p className="mt-2 text-sm font-semibold leading-7 text-slate-300">
+                    {mealRecommendation.note} 系统会把餐位、会合点和返场提醒写入同一张电子凭证，减少用户订票后的停留焦虑。
+                  </p>
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-4">
+                    {[
+                      { label: mealPeriod === 'day' ? '白天停留' : '夜航停留', icon: mealPeriod === 'day' ? SunMedium : Moon },
+                      { label: mealPersona === 'E' ? 'E 型社交' : 'I 型低打扰', icon: UsersRound },
+                      { label: mealEnergy === 'high' ? '高能量' : '低能量', icon: mealEnergy === 'high' ? Zap : BatteryCharging },
+                      { label: mealRecommendation.table, icon: ChefHat },
+                    ].map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <div key={item.label} className="rounded-2xl border border-white/10 bg-white/8 p-3">
+                          <Icon size={16} className="text-orange-200" />
+                          <div className="mt-2 text-[11px] font-black text-slate-100">{item.label}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex gap-2">
+                      {(['E', 'I'] as const).map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => setMealPersona(item)}
+                          className={`rounded-full px-3 py-2 text-[11px] font-black transition ${
+                            mealPersona === item ? 'bg-cyan-200 text-slate-950' : 'bg-white/8 text-slate-300 hover:bg-white/14'
+                          }`}
+                        >
+                          {item === 'E' ? 'E 人社交' : 'I 人低打扰'}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      {(['high', 'low'] as const).map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => setMealEnergy(item)}
+                          className={`rounded-full px-3 py-2 text-[11px] font-black transition ${
+                            mealEnergy === item ? 'bg-orange-200 text-slate-950' : 'bg-white/8 text-slate-300 hover:bg-white/14'
+                          }`}
+                        >
+                          {item === 'high' ? '高能量' : '低能量'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-white/15 bg-white/10 p-4">
+                  <div className="meal-pulse-ring mx-auto flex h-24 w-24 items-center justify-center rounded-full p-[4px]">
+                    <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-slate-950">
+                      <span className="text-3xl font-black leading-none">{mealRecommendation.score}</span>
+                      <span className="mt-1 text-[10px] font-black text-cyan-100">MATCH</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 text-center text-xs font-semibold leading-6 text-slate-300">
+                    订票页推荐不打断主流程，只把最合适的餐位作为随票权益锁定。
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleAddon('ai-group-meal')}
+                    className={`mt-4 flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-xs font-black transition ${
+                      isMealSelected
+                        ? 'bg-cyan-200 text-slate-950 shadow-lg shadow-cyan-400/20'
+                        : 'bg-white text-slate-950 hover:bg-cyan-50'
+                    }`}
+                  >
+                    <Sparkles size={15} />
+                    <span>{isMealSelected ? '已加入订单' : '加入 AI 团餐匹配'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Selected Package Details */}
           <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">

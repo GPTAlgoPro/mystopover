@@ -8,7 +8,7 @@ import { BaggageStatus } from '@/lib/types';
 import { 
   Briefcase, Clock, Compass, MapPin,
   User, Phone, Car, ShieldAlert, Wifi,
-  CheckCircle,
+  CheckCircle, Sparkles, ChefHat, QrCode,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -447,6 +447,40 @@ function JourneyContent() {
           )}
 
           {/* Meal Voucher */}
+          {currentOrder.addons.includes('ai-group-meal') && (
+            <div className="liquid-glass-dark rounded-3xl p-4 text-white shadow-2xl sm:p-6">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="meal-pulse-ring flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl p-[2px]">
+                    <div className="flex h-full w-full items-center justify-center rounded-2xl bg-slate-950">
+                      <ChefHat size={20} className="text-orange-200" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">
+                      <Sparkles size={13} />
+                      <span>龙腾出行 AI 团餐核销卡</span>
+                    </div>
+                    <h3 className="mt-2 text-base font-black text-white">MealPulse 已为本段停留生成餐位方案</h3>
+                    <p className="mt-1 text-[11px] font-semibold leading-6 text-slate-300">
+                      礼宾会按白天/夜晚停留、E/I 偏好、能量水平和返场倒计时确认最终餐厅；夜间优先机场直连与低步行，白天优先本地特色和可拼团体验。
+                    </p>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-white/15 bg-white/10 p-3 text-center">
+                  <QrCode size={36} className="mx-auto text-cyan-100" />
+                  <div className="mt-2 font-mono text-[10px] text-slate-300">MEAL-{currentOrder.orderId}</div>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center text-[10px] font-black text-slate-200">
+                <div className="rounded-2xl bg-white/8 px-2 py-3">餐位锁定</div>
+                <div className="rounded-2xl bg-white/8 px-2 py-3">会合点提醒</div>
+                <div className="rounded-2xl bg-white/8 px-2 py-3">返场校验</div>
+              </div>
+            </div>
+          )}
+
+          {/* Meal Voucher */}
           {currentOrder.addons.includes('meal-voucher') && (
             <div className="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm flex flex-col gap-4 items-center sm:p-6 md:flex-row md:gap-6">
               {/* Barcode */}
@@ -485,7 +519,7 @@ function JourneyContent() {
           )}
 
           {/* If no addons, show tip */}
-          {!currentOrder.addons.includes('esim') && !currentOrder.addons.includes('meal-voucher') && (
+          {!currentOrder.addons.includes('esim') && !currentOrder.addons.includes('meal-voucher') && !currentOrder.addons.includes('ai-group-meal') && (
             <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm text-center text-xs text-slate-500">
               您当前没有订购单点增值项（如 eSIM 流量包、餐饮消费券）。在套餐内含的贵宾室或微游服务已足够保障您的基础中转体验。
             </div>

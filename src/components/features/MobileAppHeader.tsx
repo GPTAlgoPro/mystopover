@@ -117,12 +117,14 @@ export default function MobileAppHeader() {
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 px-4 py-3 backdrop-blur-xl md:hidden">
         <div className="flex items-center justify-between gap-3">
           <Link href="/" className="flex min-w-0 items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary text-base font-black text-white shadow-sm">
-              S
+            <div className="meal-pulse-ring flex h-8 w-8 shrink-0 items-center justify-center rounded-xl p-[1px] shadow-sm">
+              <div className="flex h-full w-full items-center justify-center rounded-xl bg-slate-950 text-sm font-black text-white">
+                龙
+              </div>
             </div>
             <div className="min-w-0">
-              <div className="truncate text-sm font-black leading-tight text-slate-950">Stopover 中转游</div>
-              <div className="truncate text-[10px] font-bold text-slate-400">AI 礼宾 App Demo</div>
+              <div className="truncate text-sm font-black leading-tight text-slate-950">Stopover AI</div>
+              <div className="truncate text-[10px] font-bold text-slate-400">龙腾出行 · 中转礼宾</div>
             </div>
           </Link>
           <Link

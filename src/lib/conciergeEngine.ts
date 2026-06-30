@@ -118,7 +118,7 @@ function inferIntent(message: string): ConciergeIntent {
   if (/(行李|箱|托管|寄存|rfid|保险)/i.test(message)) return 'baggage';
   if (/(包车|私人|定制|司机|专车)/i.test(message)) return 'private';
   if (/(路线|城市|微游|景点|出机场|观光|一日|半日)/i.test(message)) return 'tour';
-  if (/(esim|流量|餐|券|酒店|钟点|淋浴|加购|增值|接送)/i.test(lower)) return 'addons';
+  if (/(esim|流量|餐|团餐|券|酒店|钟点|淋浴|加购|增值|接送|能量|社交|安静)/i.test(lower)) return 'addons';
   if (/(套餐|价格|多少钱|费用|推荐|选哪个|方案)/i.test(message)) return 'package';
   if (/(航班|中转|到达|离境|机场|时间|小时)/i.test(message)) return 'profile';
 
@@ -164,18 +164,20 @@ function recommendAddons(profile: ConciergeProfile, packageSku: PackageSku): Add
   result.add('esim');
 
   if (packageSku === 'light') {
+    result.add('ai-group-meal');
     result.add('shower');
     result.add('meal-voucher');
   }
 
   if (packageSku === 'micro') {
     result.add('transfer');
-    result.add('meal-voucher');
+    result.add('ai-group-meal');
   }
 
   if (packageSku === 'overnight') {
     result.add('hotel-dayuse');
     result.add('transfer');
+    result.add('ai-group-meal');
   }
 
   if (profile.wantsPrivateCar) {
@@ -292,7 +294,7 @@ export function buildConciergePlan(
       : intent === 'baggage'
         ? ['行李丢了怎么赔', 'RFID 什么时候绑定', '回机场前多久送回']
         : intent === 'addons'
-          ? ['加 eSIM 和餐券', '我要包车升级', '只想加酒店钟点房']
+        ? ['加 AI 团餐匹配', '我要包车升级', '只想加酒店钟点房']
           : ['我要下单', '看行李托管细节', '换成过夜休息方案'];
 
   return {
@@ -344,7 +346,7 @@ export function buildDeterministicReply(plan: ConciergePlan) {
   }
 
   if (plan.intent === 'addons') {
-    return `可以加购。当前最适合的是${plan.recommendedAddons.map((sku) => addons.find((item) => item.sku === sku)?.name).filter(Boolean).join('、') || 'eSIM 和餐饮券'}，我会把价格合并进同一张电子凭证。`;
+    return `可以加购。当前最适合的是${plan.recommendedAddons.map((sku) => addons.find((item) => item.sku === sku)?.name).filter(Boolean).join('、') || 'eSIM 和 AI 团餐匹配'}，我会把价格合并进同一张电子凭证。`;
   }
 
   if (plan.intent === 'checkout') {

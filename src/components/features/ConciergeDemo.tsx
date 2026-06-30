@@ -6,19 +6,23 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowRight,
   BadgeCheck,
+  BatteryCharging,
   BedDouble,
   BriefcaseBusiness,
   CalendarClock,
   Car,
+  ChefHat,
   Check,
   CircleDollarSign,
   Clock3,
   Compass,
   CreditCard,
+  Gem,
   HelpCircle,
   Luggage,
   Map,
   MessageCircle,
+  Moon,
   Plane,
   QrCode,
   Route,
@@ -27,10 +31,14 @@ import {
   ShieldCheck,
   ShowerHead,
   Sparkles,
+  SunMedium,
   TicketCheck,
   UserRound,
+  UsersRound,
   Utensils,
+  WandSparkles,
   Wifi,
+  Zap,
 } from 'lucide-react';
 import {
   buildConciergePlan,
@@ -62,6 +70,7 @@ const iconMap = {
   'hotel-dayuse': BedDouble,
   shower: ShowerHead,
   'meal-voucher': Utensils,
+  'ai-group-meal': Sparkles,
   'private-car': Compass,
 } satisfies Record<AddonSku, React.ComponentType<{ size?: number; className?: string }>>;
 
@@ -70,6 +79,119 @@ const packageTone: Record<PackageSku, { label: string; className: string }> = {
   micro: { label: '城市微游', className: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
   overnight: { label: '跨夜休息', className: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
 };
+
+type MealPersona = 'E' | 'I';
+type MealEnergy = 'high' | 'low';
+type MealPeriod = 'day' | 'night';
+
+type MealMatch = {
+  name: string;
+  label: string;
+  periodLabel: string;
+  socialLabel: string;
+  energyLabel: string;
+  route: string;
+  table: string;
+  lift: string;
+  score: number;
+  reasons: string[];
+  texture: string;
+};
+
+function getMealPeriod(arrivalTimeStr: string): MealPeriod {
+  const hour = Number(arrivalTimeStr.slice(11, 13));
+  if (!Number.isFinite(hour)) return 'day';
+  return hour >= 7 && hour < 18 ? 'day' : 'night';
+}
+
+function buildMealMatch(profile: ConciergeProfile, persona: MealPersona, energy: MealEnergy): MealMatch {
+  const period = getMealPeriod(profile.arrivalTimeStr);
+  const key = `${period}-${persona}-${energy}` as const;
+  const base: Record<typeof key, Omit<MealMatch, 'periodLabel' | 'socialLabel' | 'energyLabel' | 'score'>> = {
+    'day-E-high': {
+      name: '南洋热力拼桌团餐',
+      label: '城市感最强',
+      route: '星耀樟宜 + 老巴刹风味桌',
+      table: '4-6 人拼桌',
+      lift: '+18% 加购意愿',
+      reasons: ['白天停留适合把餐食嵌进微游路线', 'E 型高能量用户更愿意接受拼桌和本地烟火气', '餐后仍保留返场安检缓冲'],
+      texture: 'from-cyan-300 via-blue-500 to-orange-300',
+    },
+    'day-E-low': {
+      name: '轻社交早午餐会合桌',
+      label: '轻松不赶',
+      route: '航站楼花园餐厅 + 快速集合点',
+      table: '2-4 人半开放桌',
+      lift: '+12% 下单稳定度',
+      reasons: ['白天有体验感，但不拉长动线', '保留社交氛围，降低体力消耗', '适合商旅或家庭临时拼单'],
+      texture: 'from-sky-200 via-teal-300 to-amber-200',
+    },
+    'day-I-high': {
+      name: '静享本地探索餐',
+      label: '安静但有记忆点',
+      route: '机场直连商区 + 小桌精选',
+      table: '独立小桌',
+      lift: '+14% 决策速度',
+      reasons: ['I 型用户需要确定边界和低打扰座位', '高能量允许少量探索但不强制社交', '餐厅靠近返场路线，减少迷路风险'],
+      texture: 'from-violet-200 via-cyan-300 to-blue-500',
+    },
+    'day-I-low': {
+      name: '低噪补能暖食',
+      label: '少走路优先',
+      route: '贵宾厅热食 + 靠窗安静区',
+      table: '静音单人/双人位',
+      lift: '+16% 支付完成率',
+      reasons: ['低能量用户最怕额外决策和移动', '机场内完成，几乎不增加误机风险', '适合睡眠不足、带娃或行李压力大场景'],
+      texture: 'from-blue-200 via-slate-200 to-cyan-200',
+    },
+    'night-E-high': {
+      name: '夜航安全拼餐局',
+      label: '夜间也有氛围',
+      route: '机场直连夜食街 + 专人会合',
+      table: '3-5 人安全拼桌',
+      lift: '+15% 夜航转化',
+      reasons: ['夜间不建议拉远距离，优先机场直连场景', 'E 型高能量仍需要一点社交和氛围', '龙腾出行负责会合点和返场提醒'],
+      texture: 'from-indigo-300 via-blue-500 to-fuchsia-400',
+    },
+    'night-E-low': {
+      name: '轻拼宵夜补给',
+      label: '低折腾社交',
+      route: '登机口附近热食 + 小范围拼单',
+      table: '2-3 人短时拼桌',
+      lift: '+11% 降低流失',
+      reasons: ['夜间低能量用户不适合复杂路线', '保留一点同路人氛围但缩短停留', '适合红眼航班前快速补糖和热食'],
+      texture: 'from-blue-300 via-slate-400 to-orange-300',
+    },
+    'night-I-high': {
+      name: '夜间私享热食盒',
+      label: '清醒但不社交',
+      route: '贵宾厅取餐 + 安静观景位',
+      table: '独立位',
+      lift: '+13% 安心感',
+      reasons: ['夜间高能量更适合可控的小范围体验', 'I 型用户不需要拼桌，只要餐食有品质', '离登机动线近，可随时撤回'],
+      texture: 'from-cyan-200 via-indigo-400 to-violet-500',
+    },
+    'night-I-low': {
+      name: '静音恢复热汤餐',
+      label: '红眼恢复',
+      route: '淋浴后热汤 + 休息区送达',
+      table: '低打扰座位',
+      lift: '+19% 减少放弃',
+      reasons: ['夜间低能量核心是安全、热食和少走路', '餐食跟淋浴/休息室联动，降低切换成本', '返场提醒由订单状态机兜底'],
+      texture: 'from-slate-200 via-blue-300 to-cyan-300',
+    },
+  };
+  const match = base[key];
+  const score = 89 + (period === 'night' ? 3 : 0) + (energy === 'low' ? 2 : 0) + (persona === 'I' ? 1 : 0);
+
+  return {
+    ...match,
+    periodLabel: period === 'day' ? '白天停留' : '夜航停留',
+    socialLabel: persona === 'E' ? 'E 型社交' : 'I 型低打扰',
+    energyLabel: energy === 'high' ? '高能量' : '低能量',
+    score,
+  };
+}
 
 function makeId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -98,10 +220,13 @@ export default function ConciergeDemo() {
   const [profile, setProfile] = useState<ConciergeProfile>(initialResolved.profile);
   const [plan, setPlan] = useState<ConciergePlan>(initialResolved.plan);
   const [selectedAddons, setSelectedAddons] = useState<AddonSku[]>(initialResolved.plan.recommendedAddons);
+  const [mealPersona, setMealPersona] = useState<MealPersona>('E');
+  const [mealEnergy, setMealEnergy] = useState<MealEnergy>('high');
   const [inputValue, setInputValue] = useState(initialPersona.scenarioPrompt);
   const [isAsking, setIsAsking] = useState(false);
   const [lastSource, setLastSource] = useState('ready');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const didMountRef = useRef(false);
 
   const activePersona = useMemo(
     () => conciergePersonas.find((item) => item.id === activePersonaId) ?? initialPersona,
@@ -113,8 +238,17 @@ export default function ConciergeDemo() {
   const totalPrice = validSelectedAddons.reduce((sum, sku) => {
     return sum + (addons.find((item) => item.sku === sku)?.price ?? 0);
   }, activePackage.price);
+  const mealMatch = useMemo(
+    () => buildMealMatch(profile, mealPersona, mealEnergy),
+    [mealEnergy, mealPersona, profile],
+  );
+  const hasMealMatch = validSelectedAddons.includes('ai-group-meal');
 
   useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
     messagesEndRef.current?.scrollIntoView({ block: 'end' });
   }, [isAsking, messages]);
 
@@ -203,6 +337,8 @@ export default function ConciergeDemo() {
     setProfile(resolved.profile);
     setPlan(resolved.plan);
     setSelectedAddons(resolved.plan.recommendedAddons);
+    setMealPersona(persona.profile.partyType === 'rest' || persona.profile.partyType === 'family' ? 'I' : 'E');
+    setMealEnergy(persona.profile.partyType === 'rest' || persona.profile.partyType === 'family' ? 'low' : 'high');
     setInputValue('');
     setMessages([
       {
@@ -245,16 +381,18 @@ export default function ConciergeDemo() {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-57px)] min-h-0 flex-col overflow-hidden bg-[linear-gradient(180deg,#f6fbff_0%,#eef5f8_46%,#ffffff_100%)] text-slate-950 md:h-auto md:min-h-screen md:overflow-visible">
-      <section className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden md:mx-auto md:grid md:h-auto md:max-w-7xl md:grid-cols-1 md:gap-5 md:overflow-visible md:px-4 md:py-5 lg:grid-cols-[280px_minmax(0,1fr)_360px] lg:px-8 lg:py-8">
+    <div className="aurora-surface animate-aurora-flow relative flex h-[calc(100dvh-57px)] min-h-0 flex-col overflow-hidden text-slate-950 md:h-auto md:min-h-screen md:overflow-visible">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(4,10,24,0.18)_0%,rgba(7,17,35,0.76)_72%,rgba(5,10,22,0.96)_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[linear-gradient(90deg,rgba(40,231,255,0.18),rgba(255,122,69,0.12),rgba(124,61,255,0.16))] blur-3xl" />
+      <section className="relative z-10 flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden md:mx-auto md:grid md:h-auto md:max-w-7xl md:grid-cols-1 md:gap-5 md:overflow-visible md:px-4 md:py-5 lg:grid-cols-[280px_minmax(0,1fr)_360px] lg:px-8 lg:py-8">
         <aside className="hidden space-y-4 lg:block">
-          <div className="rounded-2xl border border-white/80 bg-white/78 p-4 shadow-sm backdrop-blur-xl">
-            <div className="flex items-center gap-2 text-sm font-black text-slate-950">
-              <Sparkles size={17} className="text-blue-600" />
-              <span>演示角色模板</span>
+          <div className="liquid-glass-dark rounded-3xl p-4 text-white">
+            <div className="flex items-center gap-2 text-sm font-black">
+              <Gem size={17} className="text-cyan-200" />
+              <span>龙腾出行场景舱</span>
             </div>
-            <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
-              每个角色都带航班、画像、痛点、套餐和权益数据，用来演示真实礼宾对话。
+            <p className="mt-2 text-xs font-semibold leading-5 text-slate-300">
+              航班、停留时段、行李、性格和能量进入同一个匹配引擎，推荐套餐与团餐一起随票锁定。
             </p>
           </div>
 
@@ -269,14 +407,14 @@ export default function ConciergeDemo() {
                   onClick={() => selectPersonaTemplate(persona)}
                   className={`w-[260px] shrink-0 rounded-2xl border p-3 text-left transition md:w-full ${
                     isActive
-                      ? 'border-blue-200 bg-white shadow-md ring-2 ring-blue-100'
-                      : 'border-white/80 bg-white/70 hover:border-slate-200 hover:bg-white'
+                      ? 'border-cyan-200/70 bg-white/92 shadow-2xl shadow-cyan-950/20 ring-2 ring-cyan-200/40'
+                      : 'border-white/15 bg-white/10 text-white backdrop-blur-xl hover:border-white/30 hover:bg-white/16'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm font-black text-slate-900">{persona.shortName}</div>
-                      <div className="mt-1 text-[11px] font-semibold leading-4 text-slate-500">
+                      <div className={`text-sm font-black ${isActive ? 'text-slate-900' : 'text-white'}`}>{persona.shortName}</div>
+                      <div className={`mt-1 text-[11px] font-semibold leading-4 ${isActive ? 'text-slate-500' : 'text-slate-300'}`}>
                         {persona.personaType}
                       </div>
                     </div>
@@ -284,10 +422,10 @@ export default function ConciergeDemo() {
                       {tone.label}
                     </span>
                   </div>
-                  <p className="mt-3 text-[11px] font-semibold leading-5 text-slate-600">
+                  <p className={`mt-3 text-[11px] font-semibold leading-5 ${isActive ? 'text-slate-600' : 'text-slate-200'}`}>
                     {persona.headline}
                   </p>
-                  <div className="mt-3 flex items-center gap-2 text-[10px] font-black text-slate-400">
+                  <div className={`mt-3 flex items-center gap-2 text-[10px] font-black ${isActive ? 'text-slate-400' : 'text-cyan-100/75'}`}>
                     <Plane size={12} />
                     <span>{persona.profile.arrivalFlightNo}</span>
                     <span>→</span>
@@ -300,18 +438,20 @@ export default function ConciergeDemo() {
           </div>
         </aside>
 
-        <main className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-0 border-white/80 bg-white/86 shadow-none backdrop-blur-xl md:min-h-[680px] md:rounded-3xl md:border md:bg-white/78 md:shadow-2xl md:shadow-blue-950/8 lg:min-h-[760px]">
-          <header className="shrink-0 border-b border-slate-100 bg-white/92 px-4 py-3 md:bg-white/80 md:px-5 md:py-4">
+        <main className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-0 border-white/80 bg-white/90 shadow-none backdrop-blur-2xl md:min-h-[680px] md:rounded-3xl md:border md:bg-white/78 md:shadow-2xl md:shadow-cyan-950/18 lg:min-h-[760px]">
+          <header className="hidden shrink-0 border-b border-white/50 bg-white/88 px-4 py-3 backdrop-blur-2xl md:block md:bg-white/72 md:px-5 md:py-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-950 text-sm font-black text-white md:h-10 md:w-10">
-                    S
+                  <div className="meal-pulse-ring flex h-9 w-9 items-center justify-center rounded-2xl p-[1px] text-sm font-black text-white md:h-10 md:w-10">
+                    <div className="flex h-full w-full items-center justify-center rounded-2xl bg-slate-950">
+                      龙
+                    </div>
                   </div>
                   <div>
-                    <h1 className="text-base font-black text-slate-950 md:text-lg">Stopover AI 礼宾 App</h1>
+                    <h1 className="text-base font-black text-slate-950 md:text-lg">龙腾出行 Stopover AI</h1>
                     <p className="text-[11px] font-bold text-slate-400">
-                      {lastSource.startsWith('dashscope') ? 'Qwen 多轮对话已连接' : '本地业务引擎兜底'} · {airport.nameZh}
+                      {lastSource.startsWith('dashscope') ? 'Qwen 多轮对话已连接' : '本地业务引擎兜底'} · MealPulse 团餐匹配 · {airport.nameZh}
                     </p>
                   </div>
                 </div>
@@ -338,7 +478,7 @@ export default function ConciergeDemo() {
 
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 md:px-5 md:py-5">
-              <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
+              <div className="rounded-2xl border border-white/60 bg-white/72 p-4 shadow-sm backdrop-blur-xl">
                 <div className="flex items-center gap-2 text-xs font-black text-blue-700">
                   <BadgeCheck size={15} />
                   <span>{activePersona.name}</span>
@@ -346,6 +486,118 @@ export default function ConciergeDemo() {
                 <p className="mt-2 text-xs font-semibold leading-6 text-blue-900/75">
                   {activePersona.context}
                 </p>
+              </div>
+
+              <div className="liquid-glass-dark meal-scan-line relative overflow-hidden rounded-3xl p-4 text-white shadow-2xl md:p-5">
+                <div className="relative z-10 flex flex-col gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200/35 bg-cyan-200/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">
+                          <WandSparkles size={12} />
+                          DragonPass MealPulse
+                        </span>
+                        <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-black text-orange-100">
+                          随票加购 ¥168
+                        </span>
+                      </div>
+                      <h2 className="mt-3 text-2xl font-black leading-tight tracking-normal text-white md:text-3xl">
+                        {mealMatch.name}
+                      </h2>
+                      <p className="mt-2 max-w-xl text-xs font-semibold leading-6 text-slate-200">
+                        {mealMatch.route}，按 {mealMatch.periodLabel}、{mealMatch.socialLabel}、{mealMatch.energyLabel} 自动锁定餐位和返场提醒。
+                      </p>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-3 rounded-3xl border border-white/15 bg-white/10 p-3 backdrop-blur-xl">
+                      <div className="meal-pulse-ring flex h-16 w-16 items-center justify-center rounded-full p-[3px]">
+                        <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-slate-950 text-white">
+                          <span className="text-xl font-black leading-none">{mealMatch.score}</span>
+                          <span className="text-[9px] font-black text-cyan-100">MATCH</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">转化信号</div>
+                        <div className="mt-1 text-lg font-black text-orange-200">{mealMatch.lift}</div>
+                        <div className="mt-1 text-[10px] font-semibold text-slate-400">{mealMatch.table}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3">
+                    <div className="grid gap-2 sm:grid-cols-3">
+                      {mealMatch.reasons.map((reason, index) => (
+                        <div key={reason} className="rounded-2xl border border-white/14 bg-slate-950/46 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                          <div className="mb-2 flex items-center gap-2 text-[10px] font-black text-cyan-100">
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-200/18 text-cyan-50">
+                              {index + 1}
+                            </span>
+                            <span>推荐因子</span>
+                          </div>
+                          <p className="text-[11px] font-semibold leading-5 text-slate-100">{reason}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="rounded-2xl border border-white/14 bg-slate-950/58 p-3">
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        {[
+                          { label: mealMatch.periodLabel, icon: getMealPeriod(profile.arrivalTimeStr) === 'day' ? SunMedium : Moon },
+                          { label: mealMatch.socialLabel, icon: UsersRound },
+                          { label: mealMatch.energyLabel, icon: mealEnergy === 'high' ? Zap : BatteryCharging },
+                          { label: mealMatch.label, icon: ChefHat },
+                        ].map((item) => {
+                          const Icon = item.icon;
+                          return (
+                            <div key={item.label} className="rounded-xl bg-white/10 px-2 py-2 text-[10px] font-black text-slate-100">
+                              <Icon size={13} className="mb-1 text-orange-200" />
+                              {item.label}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-3 rounded-xl bg-white/8 px-3 py-2">
+                        <div className="text-[10px] font-black text-slate-300">返场动线</div>
+                        <div className="mt-1 text-[11px] font-semibold leading-5 text-white">{mealMatch.route}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 border-t border-white/10 pt-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex gap-2">
+                      {(['E', 'I'] as MealPersona[]).map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => setMealPersona(item)}
+                          className={`rounded-full px-3 py-2 text-[11px] font-black transition ${
+                            mealPersona === item
+                              ? 'bg-cyan-200 text-slate-950 shadow-lg shadow-cyan-400/20'
+                              : 'bg-white/8 text-slate-300 hover:bg-white/14'
+                          }`}
+                        >
+                          {item === 'E' ? 'E 人社交' : 'I 人低打扰'}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      {(['high', 'low'] as MealEnergy[]).map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => setMealEnergy(item)}
+                          className={`rounded-full px-3 py-2 text-[11px] font-black transition ${
+                            mealEnergy === item
+                              ? 'bg-orange-200 text-slate-950 shadow-lg shadow-orange-400/20'
+                              : 'bg-white/8 text-slate-300 hover:bg-white/14'
+                          }`}
+                        >
+                          {item === 'high' ? '高能量' : '低能量'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:hidden">
@@ -461,25 +713,50 @@ export default function ConciergeDemo() {
         </main>
 
         <aside className="hidden space-y-4 lg:block">
-          <div className="overflow-hidden rounded-3xl border border-white/80 bg-white shadow-xl shadow-blue-950/8">
+          <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/12 shadow-2xl shadow-cyan-950/25 backdrop-blur-2xl">
             <div
-              className="h-32 bg-cover bg-center"
+              className="relative h-36 bg-cover bg-center"
               style={{ backgroundImage: `url(${airport.image})` }}
-            />
-            <div className="space-y-4 p-5">
+            >
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,12,25,0.14),rgba(6,12,25,0.78))]" />
+              <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+                <span className="rounded-full bg-white/16 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white backdrop-blur-xl">
+                  龙腾出行推荐
+                </span>
+                <span className="rounded-full bg-cyan-200 px-3 py-1 text-[10px] font-black text-slate-950">
+                  {airport.code}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-4 p-5 text-white">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <div className="text-[11px] font-black uppercase tracking-[0.16em] text-blue-600">
+                  <div className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">
                     当前推荐
                   </div>
-                  <h2 className="mt-2 text-2xl font-black text-slate-950">{plan.packageName}</h2>
-                  <p className="mt-2 text-xs font-semibold leading-6 text-slate-500">{plan.summary}</p>
+                  <h2 className="mt-2 text-2xl font-black text-white">{plan.packageName}</h2>
+                  <p className="mt-2 text-xs font-semibold leading-6 text-slate-300">{plan.summary}</p>
                 </div>
-                <div className="rounded-2xl bg-blue-600 px-3 py-2 text-right text-white shadow-lg shadow-blue-600/25">
+                <div className="rounded-2xl bg-cyan-200 px-3 py-2 text-right text-slate-950 shadow-lg shadow-cyan-400/25">
                   <div className="text-[10px] font-bold opacity-80">总价</div>
                   <div className="text-xl font-black">¥{totalPrice}</div>
                 </div>
               </div>
+
+              {hasMealMatch && (
+                <div className="rounded-2xl border border-orange-200/25 bg-orange-200/10 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-xs font-black text-orange-100">
+                      <ChefHat size={16} />
+                      <span>{mealMatch.name}</span>
+                    </div>
+                    <span className="text-[10px] font-black text-cyan-100">{mealMatch.score}%</span>
+                  </div>
+                  <p className="mt-2 text-[11px] font-semibold leading-5 text-slate-300">
+                    {mealMatch.periodLabel} / {mealMatch.socialLabel} / {mealMatch.energyLabel}，随电子凭证一起核销。
+                  </p>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-2">
                 {plan.modules.map((item) => {
@@ -494,10 +771,10 @@ export default function ConciergeDemo() {
                   const Icon = moduleIcon;
 
                   return (
-                    <div key={item.key} className="rounded-2xl bg-slate-50 p-3">
-                      <Icon size={16} className="text-blue-600" />
+                    <div key={item.key} className="rounded-2xl bg-white/10 p-3">
+                      <Icon size={16} className="text-cyan-100" />
                       <div className="mt-2 text-[10px] font-bold text-slate-400">{item.label}</div>
-                      <div className="mt-1 text-xs font-black leading-5 text-slate-800">{item.value}</div>
+                      <div className="mt-1 text-xs font-black leading-5 text-white">{item.value}</div>
                     </div>
                   );
                 })}
