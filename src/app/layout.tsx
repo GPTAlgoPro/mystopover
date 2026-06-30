@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full bg-sand text-slate-900 flex flex-col font-sans selection:bg-primary/20">
+      <body className="h-full min-h-full bg-sand text-slate-900 flex flex-col font-sans selection:bg-primary/20">
         <MobileAppHeader />
 
         {/* Navigation */}
@@ -54,7 +54,7 @@ export default function RootLayout({
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 flex min-w-0 flex-col">
+        <main className="flex-1 flex min-h-0 min-w-0 flex-col">
           {children}
         </main>
 

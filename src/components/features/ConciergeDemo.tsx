@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -91,7 +91,7 @@ export default function ConciergeDemo() {
       id: 'welcome',
       role: 'assistant',
       content:
-        '我是 Stopover 中转礼宾。你可以直接说航班、中转时长、行李和想做什么，也可以点左侧角色模板开始演示。',
+        '我是 Stopover 中转礼宾。你可以直接说航班、中转时长、行李和想做什么，也可以用推荐方案或角色模板开始演示。',
       source: 'system',
     },
   ]);
@@ -101,6 +101,7 @@ export default function ConciergeDemo() {
   const [inputValue, setInputValue] = useState(initialPersona.scenarioPrompt);
   const [isAsking, setIsAsking] = useState(false);
   const [lastSource, setLastSource] = useState('ready');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const activePersona = useMemo(
     () => conciergePersonas.find((item) => item.id === activePersonaId) ?? initialPersona,
@@ -112,6 +113,10 @@ export default function ConciergeDemo() {
   const totalPrice = validSelectedAddons.reduce((sum, sku) => {
     return sum + (addons.find((item) => item.sku === sku)?.price ?? 0);
   }, activePackage.price);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ block: 'end' });
+  }, [isAsking, messages]);
 
   const askConcierge = async (message: string, nextProfile = profile, nextAddons = selectedAddons) => {
     const trimmed = message.trim();
@@ -240,9 +245,9 @@ export default function ConciergeDemo() {
   };
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#f6fbff_0%,#eef5f8_46%,#ffffff_100%)] text-slate-950">
-      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:grid-cols-[280px_minmax(0,1fr)_360px] lg:px-8 lg:py-8">
-        <aside className="space-y-4">
+    <div className="flex h-[calc(100dvh-57px)] min-h-0 flex-col overflow-hidden bg-[linear-gradient(180deg,#f6fbff_0%,#eef5f8_46%,#ffffff_100%)] text-slate-950 md:h-auto md:min-h-screen md:overflow-visible">
+      <section className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden md:mx-auto md:grid md:h-auto md:max-w-7xl md:grid-cols-1 md:gap-5 md:overflow-visible md:px-4 md:py-5 lg:grid-cols-[280px_minmax(0,1fr)_360px] lg:px-8 lg:py-8">
+        <aside className="hidden space-y-4 lg:block">
           <div className="rounded-2xl border border-white/80 bg-white/78 p-4 shadow-sm backdrop-blur-xl">
             <div className="flex items-center gap-2 text-sm font-black text-slate-950">
               <Sparkles size={17} className="text-blue-600" />
@@ -295,16 +300,16 @@ export default function ConciergeDemo() {
           </div>
         </aside>
 
-        <main className="min-h-[680px] overflow-hidden rounded-3xl border border-white/80 bg-white/78 shadow-2xl shadow-blue-950/8 backdrop-blur-xl lg:min-h-[760px]">
-          <header className="border-b border-slate-100 bg-white/80 px-5 py-4">
+        <main className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-0 border-white/80 bg-white/86 shadow-none backdrop-blur-xl md:min-h-[680px] md:rounded-3xl md:border md:bg-white/78 md:shadow-2xl md:shadow-blue-950/8 lg:min-h-[760px]">
+          <header className="shrink-0 border-b border-slate-100 bg-white/92 px-4 py-3 md:bg-white/80 md:px-5 md:py-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-sm font-black text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-950 text-sm font-black text-white md:h-10 md:w-10">
                     S
                   </div>
                   <div>
-                    <h1 className="text-lg font-black text-slate-950">Stopover AI 礼宾 App</h1>
+                    <h1 className="text-base font-black text-slate-950 md:text-lg">Stopover AI 礼宾 App</h1>
                     <p className="text-[11px] font-bold text-slate-400">
                       {lastSource.startsWith('dashscope') ? 'Qwen 多轮对话已连接' : '本地业务引擎兜底'} · {airport.nameZh}
                     </p>
@@ -312,7 +317,7 @@ export default function ConciergeDemo() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="hidden grid-cols-3 gap-2 text-center sm:grid">
                 {[
                   { label: '中转', value: `${profile.totalTransitHours}h`, icon: Clock3 },
                   { label: '行李', value: `${profile.baggagePieces}件`, icon: Luggage },
@@ -331,8 +336,8 @@ export default function ConciergeDemo() {
             </div>
           </header>
 
-          <div className="grid min-h-[560px] grid-rows-[1fr_auto] lg:min-h-[620px]">
-            <div className="space-y-4 overflow-y-auto px-5 py-5">
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 md:px-5 md:py-5">
               <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
                 <div className="flex items-center gap-2 text-xs font-black text-blue-700">
                   <BadgeCheck size={15} />
@@ -341,6 +346,30 @@ export default function ConciergeDemo() {
                 <p className="mt-2 text-xs font-semibold leading-6 text-blue-900/75">
                   {activePersona.context}
                 </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:hidden">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">
+                      当前推荐
+                    </div>
+                    <h2 className="mt-1 truncate text-base font-black text-slate-950">{plan.packageName}</h2>
+                    <p className="mt-1 line-clamp-2 text-[11px] font-semibold leading-5 text-slate-500">{plan.summary}</p>
+                  </div>
+                  <div className="shrink-0 rounded-2xl bg-blue-600 px-3 py-2 text-right text-white shadow-lg shadow-blue-600/25">
+                    <div className="text-[9px] font-bold opacity-80">总价</div>
+                    <div className="text-lg font-black">¥{totalPrice}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={createConciergeOrder}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-xs font-black text-white transition active:scale-[0.99]"
+                >
+                  <CreditCard size={15} />
+                  <span>生成订单与电子凭证</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
 
               {messages.map((message) => (
@@ -390,9 +419,10 @@ export default function ConciergeDemo() {
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
 
-            <footer className="border-t border-slate-100 bg-white/85 p-4">
+            <footer className="shrink-0 border-t border-slate-100 bg-white/96 px-3 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 shadow-[0_-10px_30px_rgba(15,23,42,0.06)] md:bg-white/85 md:p-4 md:shadow-none">
               <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
                 {[...activePersona.demoQuestions, ...plan.quickReplies].slice(0, 6).map((question) => (
                   <button
@@ -430,7 +460,7 @@ export default function ConciergeDemo() {
           </div>
         </main>
 
-        <aside className="space-y-4">
+        <aside className="hidden space-y-4 lg:block">
           <div className="overflow-hidden rounded-3xl border border-white/80 bg-white shadow-xl shadow-blue-950/8">
             <div
               className="h-32 bg-cover bg-center"
@@ -593,7 +623,7 @@ export default function ConciergeDemo() {
         </aside>
       </section>
 
-      <section className="border-y border-slate-200 bg-white px-4 py-10 sm:px-6 lg:px-8">
+      <section className="hidden border-y border-slate-200 bg-white px-4 py-10 sm:px-6 md:block lg:px-8">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 md:grid-cols-3">
           {[
             {
