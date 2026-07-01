@@ -12,6 +12,7 @@ export type ConciergeIntent =
   | 'private'
   | 'fulfillment'
   | 'checkout'
+  | 'knowledge'
   | 'general';
 
 export type ConciergeProfile = {
@@ -115,14 +116,24 @@ function extractHours(message: string) {
 function inferIntent(message: string): ConciergeIntent {
   const lower = message.toLowerCase();
 
-  if (/(下单|付款|支付|确认|生成|凭证|二维码|qr)/i.test(message)) return 'checkout';
-  if (/(履约|追踪|状态|rfid|进度|误机|保障|赔付|改签)/i.test(message)) return 'fulfillment';
-  if (/(行李|箱|托管|寄存|rfid|保险)/i.test(message)) return 'baggage';
-  if (/(包车|私人|定制|司机|专车)/i.test(message)) return 'private';
+  if (/(下单|付款|支付|确认|生成|凭证|二维码|立即预订|马上下单|现在订|qr)/i.test(message)) return 'checkout';
+  if (/(履约|追踪|状态|rfid|进度|到哪一步|进度查询|办到哪|误机|保障|赔付|改签)/i.test(message)) return 'fulfillment';
+  if (/(行李|箱|托管|寄存|存包|寄放|rfid|保险)/i.test(message)) return 'baggage';
+  if (/(包车|私人|定制|司机|专车|用车|租车)/i.test(message)) return 'private';
   if (/(路线|城市|微游|景点|出机场|观光|一日|半日)/i.test(message)) return 'tour';
   if (/(esim|流量|餐|团餐|券|酒店|钟点|淋浴|加购|增值|接送|能量|社交|安静)/i.test(lower)) return 'addons';
   if (/(套餐|价格|多少钱|费用|推荐|选哪个|方案)/i.test(message)) return 'package';
   if (/(航班|中转|到达|离境|机场|时间|小时)/i.test(message)) return 'profile';
+  if (
+    /(好玩|玩的|景点推荐|好去处|哪里逛|美食|好吃|小吃|购物|免税|天气|气温|时差|货币|汇率|插座|电压|地铁|打车|出租车|怎么去市区|市区怎么去|有什么(玩|吃|逛|看)|值得(去|看))/i.test(
+      message,
+    ) ||
+    /(things? to (do|see)|what.{0,12}to (do|see|eat|visit)|where to go|worth (a )?(visit|seeing)|must[- ]?see|attractions|sightseeing|landmarks|tourist|weather|currency|exchange rate|time zone|duty[- ]?free|metro|subway|taxi)/i.test(
+      lower,
+    )
+  ) {
+    return 'knowledge';
+  }
 
   return 'general';
 }
@@ -303,6 +314,8 @@ export function buildConciergePlan(
         ? ['行李丢了怎么赔', 'RFID 什么时候绑定', '回机场前多久送回']
         : intent === 'addons'
         ? ['加 AI 团餐匹配', '我要包车升级', '只想加酒店钟点房']
+        : intent === 'knowledge'
+        ? ['按套餐规划行程', '行李怎么办', '还有其他玩法推荐吗']
           : ['我要下单', '看行李托管细节', '换成过夜休息方案'];
 
   return {
@@ -367,6 +380,10 @@ export function buildDeterministicReply(plan: ConciergePlan, language: LanguageC
       return 'Fulfillment moves through counter handoff, service start, return, baggage handback and boarding. If the return threshold is breached, fast return and concierge intervention start automatically.';
     }
 
+    if (plan.intent === 'knowledge') {
+      return `For live tips about ${plan.airportName} and the city, I need the online assistant connected. Meanwhile, the fit here is ${getPackageLabel(plan.packageSku, language)} from ¥${plan.packagePrice} — I can plan any sightseeing into that with baggage and return covered.`;
+    }
+
     const packageSummary =
       plan.packageSku === 'light'
         ? 'This is a short layover, so the safest value is lounge rest, baggage storage and fast track.'
@@ -394,6 +411,10 @@ export function buildDeterministicReply(plan: ConciergePlan, language: LanguageC
 
   if (plan.intent === 'fulfillment') {
     return '履约会按柜台交包、服务开始、返场、行李送回、登机签收五个节点推进；一旦返程超阈值，会自动切换快速返程和客服介入。';
+  }
+
+  if (plan.intent === 'knowledge') {
+    return `关于${plan.airportName}和当地的实时玩法建议，需要接入在线助手才能展开。当前这段中转我推荐 ${plan.packageName}，起价 ¥${plan.packagePrice}，可以把你想去的地方规划进行程，行李托管和返场缓冲都包在里面。`;
   }
 
   return `${plan.summary} 我推荐 ${plan.packageName}，起价 ¥${plan.packagePrice}；${plan.reason}`;

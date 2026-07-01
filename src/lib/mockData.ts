@@ -219,6 +219,69 @@ export const tourRoutes: TourRoute[] = [
     ]
   },
   {
+    id: 'doh-desert-6h',
+    airport: 'DOH',
+    name: '卡塔尔沙漠内海 6 小时越野探秘',
+    duration: '6小时',
+    spots: ['金沙沙丘', '内海 (Khor Al Adaid)', '骆驼农场', '瓦吉夫老集市'],
+    description: '深度体验阿拉伯沙漠，4x4 越野冲沙直抵联合国自然保护区内海。',
+    schedule: [
+      { time: '08:30', activity: '哈马德机场接机，换乘 4x4 越野车前往南部沙漠' },
+      { time: '09:30', activity: '抵达金沙沙丘，专业司机带你冲沙 (Dune Bashing)' },
+      { time: '10:45', activity: '远眺沙漠与海洋交汇的内海奇观，骆驼骑行与拍照' },
+      { time: '12:00', activity: '沙漠营地享用阿拉伯风味午餐与红茶' },
+      { time: '13:15', activity: '返程途中停靠瓦吉夫老集市补给纪念品' },
+      { time: '14:15', activity: '专车送回哈马德机场，VIP 快速安检' }
+    ]
+  },
+  {
+    id: 'dxb-classic-4h',
+    airport: 'DXB',
+    name: '迪拜地标经典 4 小时游',
+    duration: '4小时',
+    spots: ['哈利法塔', '迪拜购物中心', '迪拜喷泉'],
+    description: '直击世界第一高楼与奢华都市，感受沙漠中崛起的现代传奇。',
+    schedule: [
+      { time: '09:00', activity: '迪拜国际机场 T3 接机，向导会合乘专车出发' },
+      { time: '09:30', activity: '登顶哈利法塔 (Burj Khalifa) 124 层观景台俯瞰全城' },
+      { time: '10:45', activity: '漫步迪拜购物中心，探访室内水族馆与奢侈品长廊' },
+      { time: '11:45', activity: '欣赏迪拜喷泉音乐水舞秀，眺望帆船酒店天际线' },
+      { time: '12:20', activity: '专车启程返回迪拜国际机场' }
+    ]
+  },
+  {
+    id: 'dxb-city-6h',
+    airport: 'DXB',
+    name: '迪拜新旧城 6 小时风情漫游',
+    duration: '6小时',
+    spots: ['棕榈岛', '亚特兰蒂斯', '黄金市场', '迪拜河风情区'],
+    description: '从人工岛奇迹到传统金市，一次看尽迪拜的奢华与市井。',
+    schedule: [
+      { time: '08:30', activity: '机场接机，专车前往人工棕榈岛 (Palm Jumeirah)' },
+      { time: '09:30', activity: '外观亚特兰蒂斯酒店，海滨栈道拍照打卡' },
+      { time: '10:45', activity: '前往德拉老城，穿行黄金市场与香料市场' },
+      { time: '12:00', activity: '乘传统阿布拉水上木船横渡迪拜河，享当地午餐' },
+      { time: '13:30', activity: '自由采购纪念品，专车返程' },
+      { time: '14:30', activity: '回到迪拜国际机场，快速安检准备登机' }
+    ]
+  },
+  {
+    id: 'ist-bosphorus-6h',
+    airport: 'IST',
+    name: '博斯普鲁斯海峡 6 小时欧亚漫游',
+    duration: '6小时',
+    spots: ['托普卡帕宫', '博斯普鲁斯海峡游船', '香料市场', '加拉塔大桥'],
+    description: '横跨欧亚两洲，乘船饱览海峡两岸宫殿与城堡。',
+    schedule: [
+      { time: '08:30', activity: '伊斯坦布尔新机场接机（已过海关），专车前往老城' },
+      { time: '09:30', activity: '参观托普卡帕宫外庭，俯瞰金角湾' },
+      { time: '10:45', activity: '登船游览博斯普鲁斯海峡，观赏多尔玛巴赫切宫与要塞' },
+      { time: '12:15', activity: '海峡边餐厅享用土耳其烤鱼午餐' },
+      { time: '13:15', activity: '漫步香料市场与加拉塔大桥，品尝土耳其软糖' },
+      { time: '14:15', activity: '专车返回机场，确保航班起飞前从容抵达' }
+    ]
+  },
+  {
     id: 'ist-classic-4h',
     airport: 'IST',
     name: '伊斯坦布尔蓝色经典 4 小时游',

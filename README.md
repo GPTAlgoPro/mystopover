@@ -217,7 +217,9 @@ npm run lint     # ESLint
 
 ### AI 礼宾配置
 
-`/api/concierge` 默认使用 DashScope OpenAI-compatible endpoint。未配置 Key、接口失败或超时时，会返回本地规则引擎结果，保证现场 demo 不会中断。
+`/api/concierge` 默认使用 DashScope OpenAI-compatible endpoint（qwen3.7-max，已在请求体设置 `enable_thinking: false` 关闭思考过程，避免 reasoning 内容泄漏并节省 token）。未配置 Key、接口失败或超时时，会返回本地规则引擎结果，保证现场 demo 不会中断。
+
+礼宾助手具备四类能力：多轮对话槽位追踪、PRD 产品知识问答、中转权益套餐礼宾推荐，以及针对当前中转机场/城市的旅游通识问答（景点、美食、天气、交通、货币等）。价格、套餐、SLA 等硬规则始终由本地规则引擎给出，模型不得编造；与旅行/机场/城市无关的话题会被礼貌拦截。
 
 ```bash
 DASHSCOPE_API_KEY=...
