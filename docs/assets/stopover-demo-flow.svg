@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">Stopover five-step demo flow</title>
+  <desc id="desc">Bilingual five-step flow for hackathon demo: search, packages, checkout, order voucher, journey tracking.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f6fbff"/>
+      <stop offset="1" stop-color="#fff8f2"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#0b2b5f" flood-opacity="0.13"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="760" fill="url(#bg)"/>
+  <text x="78" y="86" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="850" fill="#09234d">5 分钟跑完整个 Stopover Demo</text>
+  <text x="78" y="128" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="650" fill="#0b5fff">Run the complete stopover story in 5 minutes</text>
+
+  <g transform="translate(74 190)">
+    <path d="M126 124 H1118" stroke="#b8d7ff" stroke-width="8" stroke-linecap="round"/>
+    <g font-family="Inter, Arial, sans-serif">
+      <g filter="url(#shadow)" transform="translate(0 0)">
+        <rect width="236" height="248" rx="24" fill="#ffffff" stroke="#d8e7fb"/>
+        <circle cx="42" cy="42" r="24" fill="#0b5fff"/>
+        <text x="35" y="51" font-size="26" font-weight="850" fill="#ffffff">1</text>
+        <text x="28" y="98" font-size="25" font-weight="850" fill="#09234d">航班计划</text>
+        <text x="28" y="128" font-size="17" fill="#526173">Search &amp; layover</text>
+        <text x="28" y="174" font-size="17" fill="#1f2a44">选择枢纽、航班、</text>
+        <text x="28" y="200" font-size="17" fill="#1f2a44">中转时长与行李数</text>
+      </g>
+      <g filter="url(#shadow)" transform="translate(254 0)">
+        <rect width="236" height="248" rx="24" fill="#ffffff" stroke="#d8e7fb"/>
+        <circle cx="42" cy="42" r="24" fill="#ff8a3d"/>
+        <text x="35" y="51" font-size="26" font-weight="850" fill="#ffffff">2</text>
+        <text x="28" y="98" font-size="25" font-weight="850" fill="#09234d">套餐匹配</text>
+        <text x="28" y="128" font-size="17" fill="#526173">Package match</text>
+        <text x="28" y="174" font-size="17" fill="#1f2a44">轻享 / 微游 / 过夜</text>
+        <text x="28" y="200" font-size="17" fill="#1f2a44">增值项一键加购</text>
+      </g>
+      <g filter="url(#shadow)" transform="translate(508 0)">
+        <rect width="236" height="248" rx="24" fill="#ffffff" stroke="#d8e7fb"/>
+        <circle cx="42" cy="42" r="24" fill="#15a46b"/>
+        <text x="35" y="51" font-size="26" font-weight="850" fill="#ffffff">3</text>
+        <text x="28" y="98" font-size="25" font-weight="850" fill="#09234d">模拟支付</text>
+        <text x="28" y="128" font-size="17" fill="#526173">Checkout</text>
+        <text x="28" y="174" font-size="17" fill="#1f2a44">履约核验信息</text>
+        <text x="28" y="200" font-size="17" fill="#1f2a44">不涉及真实扣款</text>
+      </g>
+      <g filter="url(#shadow)" transform="translate(762 0)">
+        <rect width="236" height="248" rx="24" fill="#ffffff" stroke="#d8e7fb"/>
+        <circle cx="42" cy="42" r="24" fill="#6d5dfc"/>
+        <text x="35" y="51" font-size="26" font-weight="850" fill="#ffffff">4</text>
+        <text x="28" y="98" font-size="25" font-weight="850" fill="#09234d">电子凭证</text>
+        <text x="28" y="128" font-size="17" fill="#526173">QR voucher</text>
+        <text x="28" y="174" font-size="17" fill="#1f2a44">订单 QR、RFID、</text>
+        <text x="28" y="200" font-size="17" fill="#1f2a44">服务触发按钮</text>
+      </g>
+      <g filter="url(#shadow)" transform="translate(1016 0)">
+        <rect width="236" height="248" rx="24" fill="#ffffff" stroke="#d8e7fb"/>
+        <circle cx="42" cy="42" r="24" fill="#e5484d"/>
+        <text x="35" y="51" font-size="26" font-weight="850" fill="#ffffff">5</text>
+        <text x="28" y="98" font-size="25" font-weight="850" fill="#09234d">履约追踪</text>
+        <text x="28" y="128" font-size="17" fill="#526173">Live journey</text>
+        <text x="28" y="174" font-size="17" fill="#1f2a44">行李时间线、</text>
+        <text x="28" y="200" font-size="17" fill="#1f2a44">微游与误机保障</text>
+      </g>
+    </g>
+  </g>
+
+  <g transform="translate(98 528)" filter="url(#shadow)">
+    <rect width="1204" height="118" rx="24" fill="#09234d"/>
+    <text x="34" y="45" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="850" fill="#ffffff">推荐演示口播 / Suggested Talk Track</text>
+    <text x="34" y="82" font-family="Inter, Arial, sans-serif" font-size="19" fill="#d9e8ff">“用户不是买一次观光，而是在买确定性：行李有人管、时间有人算、出机场有人带、误机有人兜底。”</text>
+    <text x="34" y="108" font-family="Inter, Arial, sans-serif" font-size="17" fill="#f7c9a6">Users are not buying sightseeing; they are buying certainty across baggage, timing, route and assurance.</text>
+  </g>
+</svg>

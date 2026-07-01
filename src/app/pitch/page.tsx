@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import {
-  ArrowRight,
   BadgeCheck,
   CheckCircle2,
   Clock3,
@@ -13,6 +12,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
+import OpenConciergeButton from '@/components/features/OpenConciergeButton';
 
 const metrics = [
   { label: '休息室单点客单', before: '约 ¥200', after: '目标 ¥450+' },
@@ -38,7 +38,7 @@ const stack = [
 export default function PitchPage() {
   return (
     <div className="bg-slate-950 text-white">
-      <section className="relative min-h-[calc(100svh-64px)] overflow-hidden px-5 pb-12 pt-10 sm:px-8 sm:py-16 lg:px-12">
+      <section className="relative min-h-[calc(100svh-64px)] overflow-hidden px-5 pb-36 pt-10 sm:px-8 sm:py-16 lg:px-12">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-28"
           style={{
@@ -75,13 +75,11 @@ export default function PitchPage() {
               ))}
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row">
-              <Link
-                href="/"
+              <OpenConciergeButton
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-black text-slate-950 shadow-xl transition hover:-translate-y-0.5 sm:h-auto sm:rounded-2xl sm:py-3"
               >
                 打开对话 Demo
-                <ArrowRight size={18} />
-              </Link>
+              </OpenConciergeButton>
               <Link
                 href="/search"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/18 bg-white/10 px-5 text-sm font-black text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/15 sm:h-auto sm:rounded-2xl sm:py-3"
@@ -246,13 +244,11 @@ export default function PitchPage() {
               我们不是卖一段观光，而是卖一段不会失控的中转时间。
             </h2>
           </div>
-          <Link
-            href="/"
+          <OpenConciergeButton
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-sm font-black text-slate-950 shadow-xl transition hover:-translate-y-0.5"
           >
             进入现场 Demo
-            <ArrowRight size={18} />
-          </Link>
+          </OpenConciergeButton>
         </div>
       </section>
     </div>

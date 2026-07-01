@@ -228,6 +228,71 @@ textarea:focus-visible {
   animation: meal-scan 3.6s infinite linear;
 }
 
+.concierge-launcher {
+  position: fixed;
+  left: max(0.875rem, env(safe-area-inset-left));
+  right: max(0.875rem, env(safe-area-inset-right));
+  bottom: max(0.875rem, env(safe-area-inset-bottom));
+  z-index: 70;
+}
+
+.concierge-dialog {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 70;
+  height: min(82dvh, 620px);
+  max-height: calc(100dvh - 4.5rem);
+}
+
+@media (min-width: 768px) {
+  .concierge-launcher {
+    left: 1.5rem;
+    right: auto;
+    bottom: 1.5rem;
+    width: min(420px, calc(100vw - 3rem));
+  }
+
+  .concierge-dialog {
+    left: 1.5rem;
+    right: auto;
+    bottom: 1.5rem;
+    width: min(440px, calc(100vw - 3rem));
+    height: min(82dvh, 620px);
+    max-height: min(720px, calc(100dvh - 3rem));
+  }
+}
+
+@media (max-width: 380px), (max-height: 720px) {
+  .concierge-launcher {
+    left: auto;
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    width: 3.75rem;
+    min-height: 3.75rem;
+    border-radius: 9999px;
+    padding: 0.625rem;
+  }
+
+  .concierge-launcher-copy,
+  .concierge-launcher-sparkle {
+    display: none !important;
+  }
+
+  .concierge-quick-replies {
+    display: none !important;
+  }
+
+  .concierge-summary-modules {
+    display: none !important;
+  }
+
+  .concierge-dialog {
+    height: min(76dvh, 520px);
+    max-height: calc(100dvh - 4.25rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .meal-scan-line::after {
     animation: none;

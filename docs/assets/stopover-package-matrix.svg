@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">Stopover package matrix</title>
+  <desc id="desc">Bilingual comparison of light, micro-tour and overnight stopover packages.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f9fcff"/>
+      <stop offset="1" stop-color="#fff7ef"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="22" flood-color="#0b2b5f" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="760" fill="url(#bg)"/>
+  <text x="76" y="82" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="850" fill="#09234d">三档套餐，一条中转履约主线</text>
+  <text x="76" y="124" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="650" fill="#0b5fff">Three packages, one fulfillment backbone</text>
+
+  <g font-family="Inter, Arial, sans-serif" filter="url(#shadow)">
+    <g transform="translate(88 186)">
+      <rect width="374" height="438" rx="30" fill="#ffffff" stroke="#cfe3ff"/>
+      <rect x="28" y="30" width="126" height="34" rx="17" fill="#eef6ff"/>
+      <text x="48" y="53" font-size="16" font-weight="800" fill="#0b5fff">6-8h</text>
+      <text x="28" y="112" font-size="34" font-weight="850" fill="#09234d">轻享包</text>
+      <text x="28" y="146" font-size="19" fill="#526173">Light Rest Package</text>
+      <text x="28" y="204" font-size="42" font-weight="850" fill="#0b5fff">¥280</text>
+      <text x="28" y="250" font-size="20" font-weight="800" fill="#09234d">适合纯休息与快速补能</text>
+      <text x="28" y="286" font-size="18" fill="#1f2a44">• 贵宾厅 3 小时</text>
+      <text x="28" y="318" font-size="18" fill="#1f2a44">• 随身行李寄存</text>
+      <text x="28" y="350" font-size="18" fill="#1f2a44">• 快速安检通道</text>
+      <text x="28" y="382" font-size="18" fill="#1f2a44">• 淋浴 / Wi-Fi / 充电</text>
+    </g>
+    <g transform="translate(514 164)">
+      <rect width="374" height="482" rx="30" fill="#ffffff" stroke="#ffc999"/>
+      <rect x="28" y="30" width="146" height="34" rx="17" fill="#fff1e5"/>
+      <text x="48" y="53" font-size="16" font-weight="800" fill="#9a4300">10-18h</text>
+      <text x="28" y="112" font-size="34" font-weight="850" fill="#09234d">微游包</text>
+      <text x="28" y="146" font-size="19" fill="#526173">City Micro-tour Package</text>
+      <text x="28" y="204" font-size="42" font-weight="850" fill="#ff8a3d">¥780</text>
+      <text x="28" y="250" font-size="20" font-weight="800" fill="#09234d">适合轻装出机场看城市</text>
+      <text x="28" y="286" font-size="18" fill="#1f2a44">• 行李全托管 + RFID</text>
+      <text x="28" y="318" font-size="18" fill="#1f2a44">• 城市 4-6 小时固定路线</text>
+      <text x="28" y="350" font-size="18" fill="#1f2a44">• 往返专车 + 双语向导</text>
+      <text x="28" y="382" font-size="18" fill="#1f2a44">• 90min 返场缓冲</text>
+      <text x="28" y="414" font-size="18" fill="#1f2a44">• 误机保障 + 改签协助</text>
+      <rect x="28" y="438" width="150" height="28" rx="14" fill="#ff8a3d"/>
+      <text x="49" y="458" font-size="14" font-weight="850" fill="#ffffff">Demo 推荐主角</text>
+    </g>
+    <g transform="translate(940 186)">
+      <rect width="374" height="438" rx="30" fill="#ffffff" stroke="#cfe9d8"/>
+      <rect x="28" y="30" width="146" height="34" rx="17" fill="#edfdf5"/>
+      <text x="48" y="53" font-size="16" font-weight="800" fill="#047857">12-36h</text>
+      <text x="28" y="112" font-size="34" font-weight="850" fill="#09234d">过夜包</text>
+      <text x="28" y="146" font-size="19" fill="#526173">Overnight Package</text>
+      <text x="28" y="204" font-size="42" font-weight="850" fill="#15a46b">¥980</text>
+      <text x="28" y="250" font-size="20" font-weight="800" fill="#09234d">适合跨夜休息与家庭中转</text>
+      <text x="28" y="286" font-size="18" fill="#1f2a44">• 行李直送合作酒店</text>
+      <text x="28" y="318" font-size="18" fill="#1f2a44">• 钟点房 / 过夜房</text>
+      <text x="28" y="350" font-size="18" fill="#1f2a44">• 机场 ↔ 酒店专车</text>
+      <text x="28" y="382" font-size="18" fill="#1f2a44">• 误机保障 + 客服介入</text>
+    </g>
+  </g>
+</svg>
