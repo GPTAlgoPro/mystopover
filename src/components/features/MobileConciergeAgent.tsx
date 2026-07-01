@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, type ComponentType, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, type ComponentType, type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -52,8 +52,47 @@ type ConciergeAction = {
   className: string;
 };
 
+type SheetDragState = {
+  pointerId: number;
+  startY: number;
+  startHeight: number;
+  lastHeight: number;
+  moved: boolean;
+  minHeight: number;
+  maxHeight: number;
+  snapPoints: number[];
+};
+
+const minimumDialogHeight = 320;
+
 function makeId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getConciergeSheetMetrics() {
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+  const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+  const isCompact = window.matchMedia('(max-width: 380px), (max-height: 720px)').matches;
+  const topOffset = isDesktop ? 48 : isCompact ? 68 : 72;
+  const maxByViewport = Math.max(minimumDialogHeight, viewportHeight - topOffset);
+  const maxHeight = isDesktop ? Math.min(620, maxByViewport) : maxByViewport;
+  const minRatio = isDesktop ? 0.42 : 0.38;
+  const midRatio = isDesktop ? 0.62 : 0.66;
+  const minHeight = Math.min(maxHeight, Math.max(minimumDialogHeight, Math.round(viewportHeight * minRatio)));
+  const midHeight = clamp(Math.round(viewportHeight * midRatio), minHeight, maxHeight);
+  const snapPoints = Array.from(new Set([minHeight, midHeight, maxHeight])).sort((a, b) => a - b);
+
+  return { minHeight, maxHeight, snapPoints };
+}
+
+function snapDialogHeight(height: number, snapPoints: number[]) {
+  return snapPoints.reduce((closest, point) =>
+    Math.abs(point - height) < Math.abs(closest - height) ? point : closest,
+  );
 }
 
 function isDashScopeSource(source?: string) {
@@ -128,6 +167,10 @@ export default function MobileConciergeAgent() {
       source: 'system',
     },
   ]);
+  const [dialogHeight, setDialogHeight] = useState<number | null>(null);
+  const [isDraggingDialog, setIsDraggingDialog] = useState(false);
+  const dialogRef = useRef<HTMLElement>(null);
+  const dragStateRef = useRef<SheetDragState | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const previousMessageCountRef = useRef(messages.length);
 
@@ -172,6 +215,25 @@ export default function MobileConciergeAgent() {
     window.addEventListener('stopover:open-concierge', openConcierge);
     return () => window.removeEventListener('stopover:open-concierge', openConcierge);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen || dialogHeight === null) return;
+
+    const clampCurrentHeight = () => {
+      const { minHeight, maxHeight } = getConciergeSheetMetrics();
+      setDialogHeight((currentHeight) =>
+        currentHeight === null ? currentHeight : clamp(currentHeight, minHeight, maxHeight),
+      );
+    };
+
+    window.addEventListener('resize', clampCurrentHeight);
+    window.visualViewport?.addEventListener('resize', clampCurrentHeight);
+
+    return () => {
+      window.removeEventListener('resize', clampCurrentHeight);
+      window.visualViewport?.removeEventListener('resize', clampCurrentHeight);
+    };
+  }, [dialogHeight, isOpen]);
 
   const businessActions = useMemo<ConciergeAction[]>(
     () => [
@@ -519,6 +581,59 @@ export default function MobileConciergeAgent() {
     }
   };
 
+  const startDialogDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (event.button !== 0) return;
+
+    const currentHeight = dialogRef.current?.getBoundingClientRect().height ?? 0;
+    const { minHeight, maxHeight, snapPoints } = getConciergeSheetMetrics();
+    const startHeight = clamp(currentHeight || maxHeight, minHeight, maxHeight);
+
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      startY: event.clientY,
+      startHeight,
+      lastHeight: startHeight,
+      moved: false,
+      minHeight,
+      maxHeight,
+      snapPoints,
+    };
+    setIsDraggingDialog(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  const dragDialog = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const dragState = dragStateRef.current;
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+    const deltaY = dragState.startY - event.clientY;
+    const nextHeight = clamp(dragState.startHeight + deltaY, dragState.minHeight, dragState.maxHeight);
+    dragState.lastHeight = nextHeight;
+    dragState.moved = dragState.moved || Math.abs(deltaY) > 4;
+    setDialogHeight(nextHeight);
+    event.preventDefault();
+  };
+
+  const stopDialogDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const dragState = dragStateRef.current;
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+    if (dragState.moved) {
+      setDialogHeight(snapDialogHeight(dragState.lastHeight, dragState.snapPoints));
+    }
+    dragStateRef.current = null;
+    setIsDraggingDialog(false);
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const dialogStyle = dialogHeight
+    ? ({ '--concierge-dialog-height': `${dialogHeight}px` } as CSSProperties)
+    : undefined;
+
   return (
     <div>
       {!isOpen && (
@@ -549,13 +664,27 @@ export default function MobileConciergeAgent() {
 
       {isOpen && (
         <section
-          className="concierge-dialog flex flex-col overflow-hidden rounded-t-[24px] border border-[#1d3559] bg-[#f8fafc] text-[#071632] shadow-2xl shadow-black/40 md:rounded-[18px]"
+          ref={dialogRef}
+          style={dialogStyle}
+          className={`concierge-dialog flex flex-col overflow-hidden rounded-t-[24px] border border-[#1d3559] bg-[#f8fafc] text-[#071632] shadow-2xl shadow-black/40 md:rounded-[18px] ${
+            isDraggingDialog ? 'concierge-dialog-dragging' : ''
+          }`}
           role="dialog"
           aria-modal="true"
           aria-label={isChinese ? '龙腾中转礼遇助手对话框' : 'DragonPass Stopover Concierge dialog'}
         >
           <div className="bg-[#06152c] px-4 pb-2.5 pt-2.5 text-white md:px-3 md:pb-2 md:pt-2">
-            <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-white/24 md:hidden" />
+            <button
+              type="button"
+              onPointerDown={startDialogDrag}
+              onPointerMove={dragDialog}
+              onPointerUp={stopDialogDrag}
+              onPointerCancel={stopDialogDrag}
+              className="concierge-drag-handle mx-auto mb-2 flex h-5 w-24 items-center justify-center rounded-full md:w-20"
+              aria-label={isChinese ? '拖动调整礼宾助手高度' : 'Drag to resize concierge dialog'}
+            >
+              <span className="h-1.5 w-12 rounded-full bg-white/24 md:w-10" />
+            </button>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
