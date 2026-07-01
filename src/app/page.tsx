@@ -1,5 +1,5 @@
-import ConciergeDemo from '@/components/features/ConciergeDemo';
+import StopoverDashboard from '@/components/features/StopoverDashboard';
 
 export default function HomePage() {
-  return <ConciergeDemo />;
+  return <StopoverDashboard />;
 }

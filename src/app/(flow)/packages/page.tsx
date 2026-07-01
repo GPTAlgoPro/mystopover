@@ -316,11 +316,13 @@ export default function PackagesPage() {
                       {(['E', 'I'] as const).map((item) => (
                         <button
                           key={item}
-                          type="button"
-                          onClick={() => setMealPersona(item)}
-                          className={`rounded-full px-3 py-2 text-[11px] font-black transition ${
-                            mealPersona === item ? 'bg-cyan-200 text-slate-950' : 'bg-white/8 text-slate-300 hover:bg-white/14'
-                          }`}
+	                          type="button"
+	                          onClick={() => setMealPersona(item)}
+	                          className={`rounded-full border px-3 py-2 text-[11px] font-black transition ${
+	                            mealPersona === item
+	                              ? 'border-cyan-100 bg-cyan-200 text-[#062033] shadow-lg shadow-cyan-400/20'
+	                              : 'border-white/12 bg-white/8 text-slate-200 hover:border-white/24 hover:bg-white/14'
+	                          }`}
                         >
                           {item === 'E'
                             ? language === 'zh-CN' ? 'E 人社交' : 'Extrovert'
@@ -332,11 +334,13 @@ export default function PackagesPage() {
                       {(['high', 'low'] as const).map((item) => (
                         <button
                           key={item}
-                          type="button"
-                          onClick={() => setMealEnergy(item)}
-                          className={`rounded-full px-3 py-2 text-[11px] font-black transition ${
-                            mealEnergy === item ? 'bg-orange-200 text-slate-950' : 'bg-white/8 text-slate-300 hover:bg-white/14'
-                          }`}
+	                          type="button"
+	                          onClick={() => setMealEnergy(item)}
+	                          className={`rounded-full border px-3 py-2 text-[11px] font-black transition ${
+	                            mealEnergy === item
+	                              ? 'border-orange-100 bg-orange-200 text-[#2f1600] shadow-lg shadow-orange-400/20'
+	                              : 'border-white/12 bg-white/8 text-slate-200 hover:border-white/24 hover:bg-white/14'
+	                          }`}
                         >
                           {item === 'high'
                             ? language === 'zh-CN' ? '高能量' : 'High energy'

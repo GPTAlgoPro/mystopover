@@ -139,7 +139,7 @@ function OrderDetailContent() {
                 <span className="text-[10px] text-slate-400">{t(language, 'order.passengerName')}</span>
                 <span className="font-bold text-slate-800 flex items-center gap-1">
                   <User size={12} className="text-slate-400" />
-                  <span>JORDAN ZHOU</span>
+                  <span>Mr. Wei</span>
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">

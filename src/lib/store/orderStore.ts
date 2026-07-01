@@ -157,7 +157,7 @@ export const useOrderStore = create<OrderState>()(
 
         const newOrder: StopoverOrder = {
           orderId,
-          userId: 'USER_JORDAN',
+          userId: 'USER_WEI',
           arrivalFlight,
           departureFlight,
           layoverAirport: searchParams.airportCode,

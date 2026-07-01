@@ -118,16 +118,16 @@ export default function MobileAppHeader() {
 
   if (!flowConfig) {
     return (
-      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 px-4 py-3 backdrop-blur-xl md:hidden">
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 px-3 py-2.5 backdrop-blur-xl md:hidden">
         <div className="flex items-center justify-between gap-3">
           <Link href="/" className="flex min-w-0 items-center gap-2">
-            <div className="meal-pulse-ring flex h-8 w-8 shrink-0 items-center justify-center rounded-xl p-[1px] shadow-sm">
+            <div className="meal-pulse-ring flex h-9 w-9 shrink-0 items-center justify-center rounded-xl p-[1px] shadow-sm">
               <div className="flex h-full w-full items-center justify-center rounded-xl bg-slate-950 text-sm font-black text-white">
                 龙
               </div>
             </div>
             <div className="min-w-0">
-              <div className="truncate text-sm font-black leading-tight text-slate-950">{t(language, 'brand.short')}</div>
+              <div className="truncate text-xs font-black leading-tight text-slate-950">{t(language, 'brand.short')}</div>
               <div className="truncate text-[10px] font-bold text-slate-400">{t(language, 'brand.subtitle')}</div>
             </div>
           </Link>

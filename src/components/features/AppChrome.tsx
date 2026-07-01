@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import DemoController from '@/components/features/DemoController';
 import MobileAppHeader from '@/components/features/MobileAppHeader';
+import MobileConciergeAgent from '@/components/features/MobileConciergeAgent';
 import PreferenceToolbar from '@/components/features/PreferenceToolbar';
 import TouchZoomLock from '@/components/features/TouchZoomLock';
 import { t } from '@/lib/appPreferences';
@@ -10,13 +12,15 @@ import { useAppPreferences } from './AppPreferenceProvider';
 
 export default function AppChrome({ children }: { children: React.ReactNode }) {
   const { language } = useAppPreferences();
+  const pathname = usePathname();
+  const isDashboardHome = pathname === '/';
 
   return (
     <div className="flex min-h-full flex-col">
       <TouchZoomLock />
-      <MobileAppHeader />
+      {!isDashboardHome && <MobileAppHeader />}
 
-      <header className="sticky top-0 z-40 hidden items-center justify-between border-b border-slate-200/60 bg-white/82 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-4 md:flex">
+      {!isDashboardHome && <header className="sticky top-0 z-40 hidden items-center justify-between border-b border-slate-200/60 bg-white/82 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-4 md:flex">
         <div className="flex min-w-0 items-center gap-3">
           <Link href="/" className="group flex min-w-0 items-center gap-2">
             <div className="meal-pulse-ring flex h-8 w-8 shrink-0 items-center justify-center rounded-lg p-[1px] text-white shadow-md transition-transform duration-200 group-hover:scale-105">
@@ -25,7 +29,7 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
               </div>
             </div>
             <span className="truncate text-lg font-extrabold tracking-normal text-slate-950 sm:text-xl">
-              {t(language, 'brand.name')} <span className="text-sm font-semibold text-accent">Stopover</span>
+              {t(language, 'brand.name')}
             </span>
           </Link>
         </div>
@@ -48,11 +52,11 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
           </nav>
           <PreferenceToolbar />
         </div>
-      </header>
+      </header>}
 
-      <main className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</main>
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col pb-24 md:pb-0">{children}</main>
 
-      <footer className="hidden border-t border-slate-800 bg-slate-950 px-6 py-8 text-center text-xs text-slate-400 md:block">
+      {!isDashboardHome && <footer className="hidden border-t border-slate-800 bg-slate-950 px-6 py-8 text-center text-xs text-slate-400 md:block">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 md:flex-row">
           <div>
             <p className="mb-1 text-sm font-bold text-slate-200">{t(language, 'footer.title')}</p>
@@ -60,9 +64,10 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
           </div>
           <p>{t(language, 'footer.rights')}</p>
         </div>
-      </footer>
+      </footer>}
 
       <DemoController />
+      <MobileConciergeAgent />
     </div>
   );
 }

@@ -16,7 +16,7 @@ export default function CheckoutPage() {
     searchParams, selectedPackageSku, selectedAddonSkus, createOrder 
   } = useOrderStore();
 
-  const [passengerName, setPassengerName] = useState('JORDAN ZHOU');
+  const [passengerName, setPassengerName] = useState('Mr. Wei');
   const [passportNo, setPassportNo] = useState('E88998899');
   const [phone, setPhone] = useState('+86 138 0000 8888');
   
@@ -119,10 +119,6 @@ export default function CheckoutPage() {
               {t(language, 'checkout.identityTitle')}
             </h3>
             
-            <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-[11px] text-amber-700 leading-relaxed">
-              ⚠️ <strong>{t(language, 'checkout.identityTitle')}</strong>{language === 'zh-CN' ? '：' : ': '}{t(language, 'checkout.identityNotice')}
-            </div>
-
             <div>
               <label htmlFor="pname" className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
                 {t(language, 'checkout.passengerName')}
@@ -132,7 +128,7 @@ export default function CheckoutPage() {
                 type="text"
                 value={passengerName}
                 onChange={(e) => setPassengerName(e.target.value.toUpperCase())}
-                placeholder={language === 'zh-CN' ? 'ZHOU JORDAN' : 'JORDAN ZHOU'}
+                placeholder="Mr. Wei"
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-primary"
                 required
               />

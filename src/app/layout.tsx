@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "龙腾出行 Stopover | AI 中转套餐与微游服务",
+  title: "龙腾中转礼遇 | AI 中转套餐与微游服务",
   description: "解决中转旅客时间、行李和体验焦虑。以机场贵宾室为信任锚，提供行李全托管、标准化城市微游和误机保障体验。",
 };
 

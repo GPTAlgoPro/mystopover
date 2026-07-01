@@ -263,6 +263,15 @@ function makeId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function displaySourceLabel(source: string | undefined, language: 'zh-CN' | 'en-US') {
+  const isChinese = language === 'zh-CN';
+  if (source?.startsWith('dashscope')) return isChinese ? '中转礼遇模型' : 'DragonPass model';
+  if (source === 'template') return isChinese ? '模板流程' : 'Template flow';
+  if (source === 'system') return isChinese ? '中转礼遇助手' : 'DragonPass Concierge';
+  if (source?.startsWith('fallback')) return isChinese ? '业务规则兜底' : 'Rule fallback';
+  return isChinese ? '业务引擎' : 'Business engine';
+}
+
 export default function ConciergeDemo() {
   const router = useRouter();
   const { language } = useAppPreferences();
@@ -738,7 +747,7 @@ export default function ConciergeDemo() {
                     {message.id === 'welcome' ? t(language, 'home.welcome') : message.content}
                     {message.source && (
                       <div className="mt-2 text-[9px] font-bold text-slate-400">
-                        {message.source}
+                        {displaySourceLabel(message.source, language)}
                       </div>
                     )}
                   </div>
@@ -1005,8 +1014,8 @@ export default function ConciergeDemo() {
               icon: UserRound,
             },
             {
-              title: 'LLM 负责礼宾与问答',
-              body: '后端带完整 history 与 PRD 知识上下文；无 Key 时按同一业务引擎兜底。',
+              title: '中转礼遇助手负责陪伴与问答',
+              body: '后端带完整 history 与 PRD 知识上下文；无模型连接时按同一业务引擎兜底。',
               icon: MessageCircle,
             },
             {

@@ -23,17 +23,17 @@ export default function PreferenceToolbar({ compact = false, showTextScale = tru
   return (
     <div className={`flex shrink-0 items-center ${compact ? 'gap-1' : 'gap-1.5'}`} aria-label="Display preferences">
       <button
-        type="button"
-        onClick={toggleLanguage}
-        className={`inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white/82 font-black text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary dark-pref-surface ${
-          compact ? 'h-9 px-2.5 text-[11px]' : 'h-10 px-3 text-xs'
-        }`}
+          type="button"
+          onClick={toggleLanguage}
+          className={`inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white/82 font-black text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary dark-pref-surface ${
+            compact ? 'h-9 w-9 text-[11px]' : 'h-10 px-3 text-xs'
+          }`}
         aria-label={isChinese ? 'Switch to English' : '切换到中文'}
         title={isChinese ? 'Switch to English' : '切换到中文'}
-      >
-        <Languages size={compact ? 13 : 14} />
-        <span>{t(language, 'preferences.language')}</span>
-      </button>
+        >
+          <Languages size={compact ? 13 : 14} />
+          <span className={compact ? 'sr-only' : undefined}>{t(language, 'preferences.language')}</span>
+        </button>
 
       <button
         type="button"
@@ -52,13 +52,13 @@ export default function PreferenceToolbar({ compact = false, showTextScale = tru
           type="button"
           onClick={cycleTextScale}
           className={`inline-flex items-center justify-center gap-1 rounded-full border border-slate-200 bg-white/82 font-black text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary dark-pref-surface ${
-            compact ? 'h-9 px-2.5 text-[10px]' : 'h-10 px-3 text-[11px]'
+            compact ? 'h-9 w-9 text-[10px]' : 'h-10 px-3 text-[11px]'
           }`}
           aria-label={t(language, 'preferences.textScale')}
           title={`${t(language, 'preferences.textScale')}: ${textScaleLabel}`}
         >
           <ALargeSmall size={compact ? 14 : 15} />
-          <span>{textScaleLabel}</span>
+          <span className={compact ? 'sr-only' : undefined}>{textScaleLabel}</span>
         </button>
       )}
     </div>

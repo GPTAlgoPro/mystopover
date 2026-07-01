@@ -29,7 +29,7 @@ const flow = [
 ];
 
 const stack = [
-  { title: 'AI 礼宾入口', body: 'Qwen3.7 Max 负责把自然语言转成可执行的中转方案。' },
+  { title: '中转礼遇入口', body: '把自然语言需求转成可执行的中转方案，并用卡片推进确认、下单和履约。' },
   { title: '业务状态机', body: '订单、行李、微游、酒店和误机保障按可解释状态流转。' },
   { title: 'Mock 枢纽数据', body: '首站新加坡樟宜，保留多哈、伊斯坦布尔、迪拜扩展位。' },
   { title: '降级可演示', body: '没有模型 key 或网络失败时，自动使用确定性礼宾回复。' },
@@ -38,7 +38,7 @@ const stack = [
 export default function PitchPage() {
   return (
     <div className="bg-slate-950 text-white">
-      <section className="relative min-h-[calc(100vh-74px)] overflow-hidden px-5 py-16 sm:px-8 lg:px-12">
+      <section className="relative min-h-[calc(100svh-64px)] overflow-hidden px-5 pb-12 pt-10 sm:px-8 sm:py-16 lg:px-12">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-28"
           style={{
@@ -46,66 +46,80 @@ export default function PitchPage() {
               'url(https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&q=80&w=1800)',
           }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.98),rgba(15,23,42,0.76),rgba(15,23,42,0.42))]" />
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.98)_0%,rgba(15,23,42,0.82)_46%,rgba(15,23,42,0.5)_100%)] lg:bg-[linear-gradient(90deg,rgba(2,6,23,0.98),rgba(15,23,42,0.76),rgba(15,23,42,0.42))]" />
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
           <div>
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-blue-100 backdrop-blur-xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-blue-100 backdrop-blur-xl sm:mb-8 sm:px-4 sm:text-xs sm:tracking-[0.18em]">
               <Plane size={15} />
               Hackathon Demo
             </div>
-            <h1 className="max-w-4xl text-5xl font-black leading-[0.96] tracking-normal sm:text-7xl">
-              Stopover 中转游
-              <span className="block text-blue-200">机场等待的第二增长曲线</span>
+            <h1 className="max-w-4xl font-black tracking-normal">
+              <span className="block text-[2.45rem] leading-none text-white sm:inline sm:text-7xl">
+                龙腾
+              </span>
+              <span className="mt-2 block text-[2.2rem] leading-none text-white sm:mt-0 sm:inline sm:text-7xl">
+                {' '}中转礼遇
+              </span>
+              <span className="mt-4 block text-[1.85rem] leading-[1.12] text-blue-200 sm:mt-4 sm:text-6xl sm:leading-[1.04]">
+                机场等待的增长曲线
+              </span>
             </h1>
-            <p className="mt-8 max-w-2xl text-base leading-8 text-slate-200 sm:text-xl">
-              用 AI 礼宾把“我有 10 小时中转”翻译成可售卖、可履约、可保障的机场生态服务包，让旅客放心走出机场，也让休息室用户完成套餐升级。
+            <p className="mt-6 max-w-2xl text-[15px] font-medium leading-7 text-slate-200 sm:mt-8 sm:text-xl sm:leading-9">
+              龙腾中转礼遇全程陪伴到达、交包、推荐、下单、追踪和返场保障。用户既可以用自然语言对话 + 卡片丝滑完成业务流程，也可以直接套用模板，确定性跑通代表性中转场景。
             </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-wrap gap-2 text-[11px] font-black text-slate-100 sm:mt-8 sm:text-xs">
+              {['自然语言对话', '可操作卡片', '模板确定性流程'].map((item) => (
+                <span key={item} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 backdrop-blur-xl">
+                  {item}
+                </span>
+              ))}
+            </div>
+            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row">
               <Link
                 href="/"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-xl transition hover:-translate-y-0.5"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-black text-slate-950 shadow-xl transition hover:-translate-y-0.5 sm:h-auto sm:rounded-2xl sm:py-3"
               >
-                打开手机 Demo
+                打开对话 Demo
                 <ArrowRight size={18} />
               </Link>
               <Link
                 href="/search"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/18 bg-white/10 px-5 py-3 text-sm font-black text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/15"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/18 bg-white/10 px-5 text-sm font-black text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/15 sm:h-auto sm:rounded-2xl sm:py-3"
               >
-                查看传统流程
+                查看模板流程
               </Link>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/12 bg-white/10 p-5 shadow-2xl backdrop-blur-2xl">
-            <div className="rounded-[1.5rem] bg-white p-5 text-slate-950">
+          <div className="rounded-[1.75rem] border border-white/12 bg-white/10 p-4 shadow-2xl backdrop-blur-2xl sm:rounded-[2rem] sm:p-5">
+            <div className="rounded-[1.25rem] bg-white p-4 text-slate-950 sm:rounded-[1.5rem] sm:p-5">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">
                     Demo Case
                   </div>
-                  <div className="mt-2 text-2xl font-black">新加坡 10 小时中转</div>
+                  <div className="mt-2 text-xl font-black sm:text-2xl">新加坡 10 小时中转</div>
                 </div>
-                <div className="rounded-2xl bg-blue-600 px-4 py-3 text-right text-white">
+                <div className="rounded-xl bg-blue-600 px-3 py-2 text-right text-white sm:rounded-2xl sm:px-4 sm:py-3">
                   <div className="text-[10px] font-bold opacity-80">推荐</div>
                   <div className="text-lg font-black">微游包</div>
                 </div>
               </div>
-              <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="mt-5 grid grid-cols-2 gap-2 sm:mt-6 sm:gap-3">
                 {[
                   ['08:30', 'SQ833 抵达'],
                   ['09:20', '向导出发'],
                   ['13:00', '城市路线结束'],
                   ['16:50', '返抵安检口'],
                 ].map(([time, label]) => (
-                  <div key={label} className="rounded-2xl bg-slate-50 p-4">
-                    <div className="text-xl font-black text-slate-950">{time}</div>
+                  <div key={label} className="rounded-xl bg-slate-50 p-3 sm:rounded-2xl sm:p-4">
+                    <div className="text-lg font-black text-slate-950 sm:text-xl">{time}</div>
                     <div className="mt-1 text-xs font-bold text-slate-500">{label}</div>
                   </div>
                 ))}
               </div>
-              <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm font-bold leading-7 text-emerald-800">
-                返程缓冲、VIP 安检、误机改签和行李保险是这个产品的信任底座。
+              <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-xs font-bold leading-6 text-emerald-800 sm:mt-5 sm:rounded-2xl sm:p-4 sm:text-sm sm:leading-7">
+                龙腾中转礼遇把返程缓冲、VIP 安检、误机改签和行李保险打包成可跟踪的信任底座。
               </div>
             </div>
           </div>
