@@ -52,6 +52,7 @@ import {
   localizePackage,
   t,
 } from '@/lib/appPreferences';
+import { STOP_OVER_PRD } from '@/lib/prdRules';
 import type { AddonSku, PackageSku } from '@/lib/types';
 import { useOrderStore } from '@/lib/store/orderStore';
 import { useAppPreferences } from '@/components/features/AppPreferenceProvider';
@@ -344,9 +345,9 @@ export default function ConciergeDemo() {
     language === 'zh-CN'
       ? plan.safeguards
       : [
-          'Return time is calculated backward from the departure flight with a 90-minute airport buffer.',
-          'Baggage is photographed, RFID-tagged and covered up to ¥5,000 per piece.',
-          'If our route or transfer causes a missed connection, rebooking, lodging and concierge intervention are triggered.',
+          `Baggage return starts ${STOP_OVER_PRD.baggageReturnBufferMin} minutes before departure, and the traveler must reach security ${STOP_OVER_PRD.securityGateDeadlineMin} minutes before departure.`,
+          `Baggage is photographed, RFID-tagged within ${STOP_OVER_PRD.baggageTransferSlaMin} minutes and covered up to ¥${STOP_OVER_PRD.baggageCoverageCny} per piece.`,
+          `If our route or transfer causes a missed connection, rebooking, lodging and concierge intervention within ${STOP_OVER_PRD.conciergeInterventionSlaMin} minutes are triggered.`,
         ];
   const localizedModules =
     language === 'zh-CN'

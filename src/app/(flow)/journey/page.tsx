@@ -146,7 +146,13 @@ function JourneyContent() {
             <div className="bg-white/80 rounded-2xl p-4 border border-rose-100 text-xs text-slate-700 leading-relaxed mb-4 space-y-2">
               <div className="flex items-start gap-1.5">
                 <span className="text-rose-600 font-bold">1.</span>
-                <span>我们已为您改签至后段航班 <strong>SQ322 (新加坡港 → 伦敦希思罗)</strong>，起飞时间延后 4 小时，改签手续费已全额垫付。</span>
+                <span>
+                  我们已为您改签至后段航班{' '}
+                  <strong>
+                    {currentOrder.departureFlight.flightNo} ({currentAirport.nameZh} → {currentOrder.departureFlight.to})
+                  </strong>
+                  ，起飞时间延后 4 小时，改签手续费已全额垫付。
+                </span>
               </div>
               <div className="flex items-start gap-1.5">
                 <span className="text-rose-600 font-bold">2.</span>

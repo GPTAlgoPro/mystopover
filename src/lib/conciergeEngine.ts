@@ -1,5 +1,6 @@
 import { addons, airports, packages, tourRoutes } from './mockData';
 import { getAddonLabel, getPackageLabel, type LanguageCode } from './appPreferences';
+import { getRecommendedPackageSku, STOP_OVER_PRD } from './prdRules';
 import type { AddonSku, AirportCode, PackageSku } from './types';
 
 export type ConciergeIntent =
@@ -86,7 +87,7 @@ const airportAliases: Array<{ code: AirportCode; patterns: string[] }> = [
 
 function clampLayover(totalHours: number, packageSku: PackageSku) {
   if (packageSku === 'light') {
-    return Math.max(3, Math.min(totalHours, totalHours - 2));
+    return Math.max(STOP_OVER_PRD.minServiceWindowHours, Math.min(totalHours, totalHours - 2));
   }
 
   if (packageSku === 'micro') {
@@ -127,10 +128,12 @@ function inferIntent(message: string): ConciergeIntent {
 }
 
 function inferPackage(profile: ConciergeProfile, forceAirportRisk = false): PackageSku {
-  if (forceAirportRisk) return 'light';
-  if (profile.needsHotel || profile.totalTransitHours >= 18) return 'overnight';
-  if (profile.wantsCityTour || profile.wantsPrivateCar || profile.totalTransitHours >= 10) return 'micro';
-  return 'light';
+  return getRecommendedPackageSku(profile.totalTransitHours, {
+    hasEntryRisk: forceAirportRisk,
+    needsHotel: profile.needsHotel,
+    wantsCityTour: profile.wantsCityTour,
+    wantsPrivateCar: profile.wantsPrivateCar,
+  });
 }
 
 function buildTimeline(profile: ConciergeProfile, packageSku: PackageSku) {
@@ -146,8 +149,8 @@ function buildTimeline(profile: ConciergeProfile, packageSku: PackageSku) {
     return [
       { time: '08:50', label: '中转柜台交包', detail: '行李拍照登记，RFID 绑定订单' },
       { time: '09:20', label: '向导接驳出发', detail: '固定路线和车辆信息同步到订单' },
-      { time: '13:00', label: '城市微游结束', detail: '完成核心景点与餐食，预留返程缓冲' },
-      { time: '16:50', label: '回到机场', detail: '触发 VIP 安检和行李归还节点' },
+      { time: '13:00', label: '回到机场贵宾厅', detail: '完成核心景点与餐食，回到休息室补能' },
+      { time: '17:00', label: '行李送回与快速安检', detail: `起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟进入签收、VIP 安检和登机准备节点` },
     ];
   }
 
@@ -272,8 +275,12 @@ export function buildConciergePlan(
     missingSlots.push('中转机场', '总中转时长');
   }
 
-  if (profile.totalTransitHours < 6) {
+  if (profile.totalTransitHours < STOP_OVER_PRD.productRange.minHours) {
     missingSlots.push('可订购时长不足 6 小时');
+  }
+
+  if (profile.totalTransitHours > STOP_OVER_PRD.productRange.maxHours) {
+    missingSlots.push('超出 MVP 48 小时产品范围');
   }
 
   const routeSummary =
@@ -310,7 +317,7 @@ export function buildConciergePlan(
       summary,
       reason:
         packageSku === 'micro'
-          ? `PRD 要求微游包覆盖 10-18 小时白天中转；当前 ${profile.totalTransitHours} 小时满足固定路线和 60 分钟前返场要求。`
+          ? `PRD 要求微游包覆盖 10-18 小时白天中转；当前 ${profile.totalTransitHours} 小时满足固定路线，需在起飞前 ${STOP_OVER_PRD.securityGateDeadlineMin} 分钟到达安检口，并在起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟启动行李返场。`
           : packageSku === 'overnight'
             ? '跨夜或长停旅客更需要酒店/钟点房、接送和补眠，城市游不是第一优先级。'
             : '短停旅客风险主要在时间和安检，优先休息室、寄存和快速安检，不建议出机场。',
@@ -327,9 +334,9 @@ export function buildConciergePlan(
       ],
       timeline: buildTimeline(profile, packageSku),
       safeguards: [
-        '返场时间按离境航班倒推，默认保留 90 分钟安检缓冲。',
-        '行李交付后拍照登记并绑定 RFID，最高 ¥5000/件保障。',
-        '若我方路线或接送导致误机，自动进入改签协助、餐宿补偿和客服介入。',
+        `返场时间按离境航班倒推，起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟启动行李送回，起飞前 ${STOP_OVER_PRD.securityGateDeadlineMin} 分钟必须到达安检口。`,
+        `行李交付后 ${STOP_OVER_PRD.baggageTransferSlaMin} 分钟内拍照登记并绑定 RFID，最高 ¥${STOP_OVER_PRD.baggageCoverageCny}/件保障。`,
+        `若我方路线或接送导致误机，自动进入改签协助、餐宿补偿，客服 ${STOP_OVER_PRD.conciergeInterventionSlaMin} 分钟内介入。`,
       ],
       missingSlots,
       quickReplies,
@@ -344,7 +351,7 @@ export function buildDeterministicReply(plan: ConciergePlan, language: LanguageC
     }
 
     if (plan.intent === 'baggage') {
-      return `Baggage is photographed, RFID-tagged and linked to the order. This plan includes ${plan.modules.find((item) => item.key === 'baggage')?.value}. Return is triggered 90 minutes before departure, with coverage up to ¥5,000 per piece.`;
+      return `Baggage is photographed, RFID-tagged and linked to the order. This plan includes ${plan.modules.find((item) => item.key === 'baggage')?.value}. Return is triggered ${STOP_OVER_PRD.baggageReturnBufferMin} minutes before departure, with coverage up to ¥${STOP_OVER_PRD.baggageCoverageCny} per piece.`;
     }
 
     if (plan.intent === 'addons') {
@@ -374,7 +381,7 @@ export function buildDeterministicReply(plan: ConciergePlan, language: LanguageC
   }
 
   if (plan.intent === 'baggage') {
-    return `行李会在柜台拍照、贴 RFID 并绑定订单，当前方案含 ${plan.modules.find((item) => item.key === 'baggage')?.value}。取回节点会在起飞前 90 分钟自动提醒，最高 ¥5000/件保障。`;
+    return `行李会在柜台拍照、贴 RFID 并绑定订单，当前方案含 ${plan.modules.find((item) => item.key === 'baggage')?.value}。取回节点会在起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟自动提醒，最高 ¥${STOP_OVER_PRD.baggageCoverageCny}/件保障。`;
   }
 
   if (plan.intent === 'addons') {

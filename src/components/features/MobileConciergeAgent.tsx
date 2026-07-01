@@ -23,11 +23,12 @@ import {
 import {
   buildConciergePlan,
   buildDeterministicReply,
-  defaultConciergeProfile,
   type ConciergeMessage,
   type ConciergePlan,
   type ConciergeProfile,
 } from '@/lib/conciergeEngine';
+import { conciergePersonas } from '@/lib/conciergePersonas';
+import { STOP_OVER_PRD } from '@/lib/prdRules';
 import { useOrderStore } from '@/lib/store/orderStore';
 import type { AddonSku, OrderStatus, StopoverOrder } from '@/lib/types';
 import { useAppPreferences } from './AppPreferenceProvider';
@@ -37,8 +38,9 @@ type ChatItem = ConciergeMessage & {
   source?: string;
 };
 
-const seedPromptZh = '我在新加坡中转 10 小时，有 1 件行李，想轻松看一下城市但不能误机。';
-const seedResolved = buildConciergePlan(seedPromptZh, defaultConciergeProfile, ['esim', 'ai-group-meal']);
+const seedPersona = conciergePersonas[0];
+const seedPromptZh = seedPersona.scenarioPrompt;
+const seedResolved = buildConciergePlan(seedPromptZh, seedPersona.profile, seedPersona.defaultAddons);
 const conciergeNameZh = '龙腾中转礼遇助手';
 const conciergeNameEn = 'DragonPass Stopover Concierge';
 
@@ -162,8 +164,8 @@ export default function MobileConciergeAgent() {
       id: 'mobile-welcome',
       role: 'assistant',
       content: isChinese
-        ? '我是龙腾中转礼遇助手。告诉我机场、停留时长和行李，我会给出套餐、托管、下单和返场保障建议。'
-        : 'I am DragonPass Stopover Concierge. Tell me your airport, layover time and bags, and I will guide package, custody, order and return assurance.',
+        ? '我是龙腾中转礼遇助手。告诉我机场、停留时长和行李，我会按 PRD 的 6-48 小时规则给出套餐、托管、下单和返场保障建议。'
+        : 'I am DragonPass Stopover Concierge. Tell me your airport, layover time and bags, and I will follow the PRD 6-48h rules for package, custody, order and return assurance.',
       source: 'system',
     },
   ]);
@@ -280,7 +282,9 @@ export default function MobileConciergeAgent() {
         id: 'return',
         icon: Navigation,
         label: isChinese ? '返场送回' : 'Return flow',
-        detail: isChinese ? '起飞前 90 分钟' : '90min before departure',
+        detail: isChinese
+          ? `起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟`
+          : `${STOP_OVER_PRD.baggageReturnBufferMin}min before departure`,
         className: 'border-[#d8e2ef] bg-[#eef4fb] text-[#5d6f86]',
       },
       {
@@ -535,8 +539,8 @@ export default function MobileConciergeAgent() {
         transitionOrder(
           returnTrigger,
           isChinese
-            ? '助手触发：起飞前 90 分钟返场与行李送回流程已启动。'
-            : 'Concierge triggered 90-minute return and baggage handback flow.',
+            ? `助手触发：起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟返场与行李送回流程已启动。`
+            : `${STOP_OVER_PRD.baggageReturnBufferMin}-minute return and baggage handback flow triggered.`,
         );
       }
       setIsOpen(false);

@@ -38,6 +38,18 @@ interface OrderState {
   resetStore: () => void;
 }
 
+const airlineByPrefix: Record<string, string> = {
+  EK: '阿联酋航空',
+  QR: '卡塔尔航空',
+  SQ: '新加坡航空',
+  TK: '土耳其航空',
+  TR: '酷航',
+};
+
+function getAirlineName(flightNo: string) {
+  return airlineByPrefix[flightNo.substring(0, 2).toUpperCase()] ?? '合作航司';
+}
+
 export const useOrderStore = create<OrderState>()(
   persist(
     (set, get) => ({
@@ -80,7 +92,7 @@ export const useOrderStore = create<OrderState>()(
         // Mock flight details
         const arrivalFlight: Flight = {
           flightNo: searchParams.arrivalFlightNo,
-          airline: searchParams.arrivalFlightNo.substring(0, 2).toUpperCase() === 'SQ' ? '新加坡航空' : '酷航',
+          airline: getAirlineName(searchParams.arrivalFlightNo),
           from: 'PVG',
           to: searchParams.airportCode,
           arrivalTime: dayjs(searchParams.arrivalTimeStr).toISOString(),
@@ -90,7 +102,7 @@ export const useOrderStore = create<OrderState>()(
 
         const departureFlight: Flight = {
           flightNo: searchParams.departureFlightNo,
-          airline: searchParams.departureFlightNo.substring(0, 2).toUpperCase() === 'SQ' ? '新加坡航空' : '酷航',
+          airline: getAirlineName(searchParams.departureFlightNo),
           from: searchParams.airportCode,
           to: 'LHR',
           arrivalTime: dayjs(searchParams.departureTimeStr).add(12, 'hour').toISOString(),

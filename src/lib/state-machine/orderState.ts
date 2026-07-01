@@ -1,4 +1,5 @@
 import { OrderStatus } from '../types';
+import { STOP_OVER_PRD } from '../prdRules';
 
 export interface Transition {
   from: OrderStatus;
@@ -48,7 +49,7 @@ export const orderTransitions: Transition[] = [
     from: 'in_lounge',
     to: 'baggage_returning',
     trigger: 'PREPARE_RETURN',
-    description: '离境航班起飞前 90 分钟，行李服务处开始将托管行李运往归还点'
+    description: `离境航班起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟，行李服务处开始将托管行李运往归还点`
   },
   {
     from: 'in_city_tour',

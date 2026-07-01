@@ -57,7 +57,7 @@ export const conciergePersonas: ConciergePersonaTemplate[] = [
       { label: '路线', value: '滨海湾花园 / 鱼尾狮 / 牛车水' },
       { label: '返场', value: '16:50 前回机场' },
     ],
-    operationsNotes: ['09:20 向导接驳', '13:00 结束城市路线', '起飞前 90 分钟行李送回'],
+    operationsNotes: ['09:20 向导接驳', '13:00 回到机场贵宾厅', '起飞前 90 分钟行李返场 / 60 分钟安检阈值'],
   },
   {
     id: 'sin-family-overnight',
@@ -127,7 +127,7 @@ export const conciergePersonas: ConciergePersonaTemplate[] = [
       { label: '休息', value: '贵宾厅 3h' },
       { label: '边界', value: '不建议出机场' },
     ],
-    operationsNotes: ['T+20 分钟寄存行李', '进入贵宾厅补眠', '起飞前 90 分钟进入安检'],
+    operationsNotes: ['T+20 分钟寄存行李', '进入贵宾厅补眠', '起飞前 90 分钟行李返场 / 60 分钟安检阈值'],
   },
   {
     id: 'doh-premium-private',

@@ -5,6 +5,7 @@ import { useOrderStore } from '@/lib/store/orderStore';
 import { getAvailableTriggers, orderTransitions } from '@/lib/state-machine/orderState';
 import { OrderStatus } from '@/lib/types';
 import { getPackageLabel } from '@/lib/appPreferences';
+import { STOP_OVER_PRD } from '@/lib/prdRules';
 import { useAppPreferences } from '@/components/features/AppPreferenceProvider';
 import { 
   Terminal, RotateCcw,
@@ -52,8 +53,8 @@ const transitionLabels: Record<string, { zh: string; en: string }> = {
     en: 'Tour ends and transfer continues to the partner hotel for overnight rest',
   },
   PREPARE_RETURN: {
-    zh: '离境航班起飞前 90 分钟，行李服务处开始将托管行李运往归还点',
-    en: '90 minutes before departure, baggage custody starts return delivery',
+    zh: `离境航班起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟，行李服务处开始将托管行李运往归还点`,
+    en: `${STOP_OVER_PRD.baggageReturnBufferMin} minutes before departure, baggage custody starts return delivery`,
   },
   PREPARE_RETURN_FROM_TOUR: {
     zh: '离境起飞时间临近，微游返程，行李运往机场归还点',

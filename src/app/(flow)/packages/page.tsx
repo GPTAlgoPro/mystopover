@@ -4,8 +4,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOrderStore } from '@/lib/store/orderStore';
 import { packages, addons, airports } from '@/lib/mockData';
-import { PackageSku } from '@/lib/types';
 import { formatHours, localizeAddon, localizeAirport, localizePackage, t } from '@/lib/appPreferences';
+import { getPackageTimeFit, getRecommendedPackageSku } from '@/lib/prdRules';
 import { useAppPreferences } from '@/components/features/AppPreferenceProvider';
 import { 
   Wifi, Car, Utensils, Compass, BedDouble, ShowerHead,
@@ -28,13 +28,6 @@ export default function PackagesPage() {
       router.push('/search');
     }
   }, [searchParams, router]);
-
-  // Decide recommended package based on layover duration
-  const getRecommendedPackageSku = (hours: number): PackageSku => {
-    if (hours < 10) return 'light';
-    if (hours >= 10 && hours < 18) return 'micro';
-    return 'overnight';
-  };
 
   const recommendedSku = searchParams ? getRecommendedPackageSku(searchParams.totalTransitHours) : 'light';
   const [mealPersona, setMealPersona] = useState<'E' | 'I'>('E');
@@ -206,7 +199,8 @@ export default function PackagesPage() {
               const pkg = localizePackage(rawPkg, language);
               const isRecommended = pkg.sku === recommendedSku;
               const isSelected = selectedPackageSku === pkg.sku;
-              const isDisabled = searchParams.totalTransitHours < pkg.recommendedLayover.minHours;
+              const timeFit = getPackageTimeFit(pkg.sku, searchParams.totalTransitHours);
+              const isDisabled = timeFit.belowMin;
               return (
                 <div
                   key={pkg.sku}
@@ -224,6 +218,10 @@ export default function PackagesPage() {
                       {language === 'zh-CN'
                         ? `时长不足 (需≥${pkg.recommendedLayover.minHours}h)`
                         : `${t(language, 'packages.disabled')} (min ${pkg.recommendedLayover.minHours}h)`}
+                    </span>
+                  ) : timeFit.aboveMax && !isRecommended ? (
+                    <span className="absolute top-[-10px] right-3 text-[9px] bg-slate-100 text-slate-500 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide">
+                      {language === 'zh-CN' ? '非 PRD 首选' : 'Not primary fit'}
                     </span>
                   ) : isRecommended ? (
                     <span className="absolute top-[-10px] right-3 text-[9px] bg-accent text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide">

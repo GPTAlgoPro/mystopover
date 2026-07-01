@@ -107,8 +107,8 @@ export default function PitchPage() {
                 {[
                   ['08:30', 'SQ833 抵达'],
                   ['09:20', '向导出发'],
-                  ['13:00', '城市路线结束'],
-                  ['16:50', '返抵安检口'],
+                  ['13:00', '回到机场贵宾厅'],
+                  ['17:00', '行李返场启动'],
                 ].map(([time, label]) => (
                   <div key={label} className="rounded-xl bg-slate-50 p-3 sm:rounded-2xl sm:p-4">
                     <div className="text-lg font-black text-slate-950 sm:text-xl">{time}</div>

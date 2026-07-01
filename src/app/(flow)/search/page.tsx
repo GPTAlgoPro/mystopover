@@ -7,24 +7,18 @@ import { useOrderStore } from '@/lib/store/orderStore';
 import { airports, mockFlightCases } from '@/lib/mockData';
 import { AirportCode } from '@/lib/types';
 import { formatHours, localizeAirport, t } from '@/lib/appPreferences';
+import {
+  getBoardingBufferHours,
+  getDefaultReservedServiceHours,
+  getMaxReservedServiceHours,
+  STOP_OVER_PRD,
+} from '@/lib/prdRules';
 import { useAppPreferences } from '@/components/features/AppPreferenceProvider';
 import { 
   Clock, ChevronRight, Check, Info,
   AlertTriangle, Calendar, RefreshCw,
 } from 'lucide-react';
 import dayjs from 'dayjs';
-
-const MIN_BOOKABLE_HOURS = 6;
-const ENTRY_BUFFER_HOURS = 1.5;
-const MIN_SERVICE_HOURS = 3;
-
-function getDefaultReservedHours(totalHours: number) {
-  if (totalHours < MIN_BOOKABLE_HOURS) return Math.max(0, Math.floor(totalHours));
-  if (totalHours <= 8) return Math.max(MIN_SERVICE_HOURS, Math.floor(totalHours - 2));
-  if (totalHours < 18) return Math.min(8, Math.max(4, Math.floor(totalHours - 2)));
-  if (totalHours < 36) return Math.min(18, Math.max(8, Math.floor(totalHours - 4)));
-  return Math.max(8, Math.floor(totalHours - 6));
-}
 
 const airlineLabels: Record<string, string> = {
   新加坡航空: 'Singapore Airlines',
@@ -91,7 +85,7 @@ export default function SearchPage() {
         setDepDateStr(c.departureTimeStr);
         setCalculatedTotalHours(c.calculatedLayover);
         
-        setReservedHours(getDefaultReservedHours(c.calculatedLayover));
+        setReservedHours(getDefaultReservedServiceHours(c.calculatedLayover));
       }
     }
   }, [selectedCaseId, isCustomMode]);
@@ -108,7 +102,7 @@ export default function SearchPage() {
           if (roundedHours > 0) {
             setCalculatedTotalHours(roundedHours);
             // bounds for reserved hours
-            setReservedHours(getDefaultReservedHours(roundedHours));
+            setReservedHours(getDefaultReservedServiceHours(roundedHours));
           } else {
             setCalculatedTotalHours(0);
             setReservedHours(0);
@@ -121,13 +115,13 @@ export default function SearchPage() {
   }, [arrDateStr, depDateStr, isCustomMode]);
 
   const currentAirportInfo = localizeAirport(airports.find(a => a.code === selectedAirport)!, language);
-  const maxReservedHours = Math.max(MIN_SERVICE_HOURS, Math.floor(calculatedTotalHours - 2));
+  const maxReservedHours = getMaxReservedServiceHours(calculatedTotalHours);
   const safeReservedHours = Math.min(reservedHours, maxReservedHours);
-  const boardingBufferHours = Math.max(0, Math.round((calculatedTotalHours - safeReservedHours - ENTRY_BUFFER_HOURS) * 10) / 10);
+  const boardingBufferHours = getBoardingBufferHours(calculatedTotalHours, safeReservedHours);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (calculatedTotalHours < MIN_BOOKABLE_HOURS) {
+    if (calculatedTotalHours < STOP_OVER_PRD.productRange.minHours) {
       alert(language === 'zh-CN' ? '您的航班总中转时长低于 6 小时，无法订购中转套餐。请选择其他预设。' : 'This layover is below the 6-hour minimum for stopover packages.');
       return;
     }
@@ -193,7 +187,7 @@ export default function SearchPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {mockFlightCases.map((c) => {
                   const isActive = selectedCaseId === c.id;
-                  const isShort = c.calculatedLayover < MIN_BOOKABLE_HOURS;
+                  const isShort = c.calculatedLayover < STOP_OVER_PRD.productRange.minHours;
                   const englishCopy = flightCaseEnglishCopy[c.id];
                   const caseLabel = language === 'zh-CN' ? c.label : englishCopy?.label ?? c.label;
                   const periodLabel = language === 'zh-CN' ? c.periodDesc.split(' / ')[0] : englishCopy?.period ?? c.periodDesc;
@@ -349,7 +343,7 @@ export default function SearchPage() {
                 <span className="text-slate-700">{t(language, 'search.totalLayover')}: <strong className="text-primary">{formatHours(calculatedTotalHours, language)}</strong></span>
               </div>
               
-              {calculatedTotalHours < MIN_BOOKABLE_HOURS ? (
+              {calculatedTotalHours < STOP_OVER_PRD.productRange.minHours ? (
                 /* Warning state */
                 <div className="h-10 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200 text-xs text-rose-500 font-bold gap-2">
                   <AlertTriangle size={14} />
@@ -362,7 +356,7 @@ export default function SearchPage() {
                     {/* Entry Buffer */}
                     <div 
                       className="bg-slate-300 text-slate-700 flex items-center justify-center transition-all"
-                      style={{ width: `${(ENTRY_BUFFER_HOURS / calculatedTotalHours) * 100}%` }}
+                      style={{ width: `${(STOP_OVER_PRD.entryBufferHours / calculatedTotalHours) * 100}%` }}
                       title={t(language, 'search.entryBuffer')}
                     >
                       <span className="truncate px-1">{t(language, 'search.entryBuffer')}</span>
@@ -387,7 +381,7 @@ export default function SearchPage() {
                   <div className="flex justify-between text-[9px] text-slate-400 font-semibold mt-1">
                     <span>{language === 'zh-CN' ? '机场落地' : 'Arrival'} (0h)</span>
                     <span className="text-primary font-bold">
-                      {language === 'zh-CN' ? `套餐起订：${MIN_BOOKABLE_HOURS} 小时` : `Package minimum: ${MIN_BOOKABLE_HOURS}h`}
+                      {language === 'zh-CN' ? `套餐起订：${STOP_OVER_PRD.productRange.minHours} 小时` : `Package minimum: ${STOP_OVER_PRD.productRange.minHours}h`}
                     </span>
                     <span>{language === 'zh-CN' ? '航班重新起飞' : 'Departure'} ({calculatedTotalHours}h)</span>
                   </div>
@@ -396,7 +390,7 @@ export default function SearchPage() {
             </div>
 
             {/* Slider to select reserved hours */}
-            {calculatedTotalHours >= MIN_BOOKABLE_HOURS && (
+            {calculatedTotalHours >= STOP_OVER_PRD.productRange.minHours && (
               <div className="mt-2 bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-xs font-bold text-slate-600">
@@ -409,7 +403,7 @@ export default function SearchPage() {
                 
                 <input
                   type="range"
-                  min={MIN_SERVICE_HOURS}
+                  min={STOP_OVER_PRD.minServiceWindowHours}
                   max={maxReservedHours}
                   step="1"
                   value={safeReservedHours}
@@ -480,7 +474,7 @@ export default function SearchPage() {
               </div>
             </div>
 
-            {calculatedTotalHours < MIN_BOOKABLE_HOURS ? (
+            {calculatedTotalHours < STOP_OVER_PRD.productRange.minHours ? (
               <div className="py-2.5 px-3 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-xl text-xs text-center font-bold">
                 ⚠️ {t(language, 'search.tooShort')}
               </div>

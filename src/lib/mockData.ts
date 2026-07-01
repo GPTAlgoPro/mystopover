@@ -253,7 +253,7 @@ export interface MockFlightCase {
 export const mockFlightCases: MockFlightCase[] = [
   {
     id: 'case-4h',
-    label: '4小时不可订购边界样例 (新加坡港)',
+    label: '4小时不可订购边界样例 (新加坡樟宜)',
     airportCode: 'SIN',
     arrivalFlightNo: 'SQ801',
     arrivalAirline: '新加坡航空',
@@ -267,7 +267,7 @@ export const mockFlightCases: MockFlightCase[] = [
   },
   {
     id: 'case-10h',
-    label: '10小时白天中转 (新加坡港 - 经典微游)',
+    label: '10小时白天中转 (新加坡樟宜 - 经典微游)',
     airportCode: 'SIN',
     arrivalFlightNo: 'SQ833',
     arrivalAirline: '新加坡航空',
@@ -281,7 +281,7 @@ export const mockFlightCases: MockFlightCase[] = [
   },
   {
     id: 'case-23h',
-    label: '23小时跨夜中转 (新加坡港 - 舒适舒缓型)',
+    label: '23小时跨夜中转 (新加坡樟宜 - 家庭过夜休息)',
     airportCode: 'SIN',
     arrivalFlightNo: 'SQ825',
     arrivalAirline: '新加坡航空',

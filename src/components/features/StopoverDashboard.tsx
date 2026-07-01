@@ -29,6 +29,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { useAppPreferences } from './AppPreferenceProvider';
+import { STOP_OVER_PRD } from '@/lib/prdRules';
 
 type DashboardCopy = {
   brand: string;
@@ -41,19 +42,28 @@ type DashboardCopy = {
   help: string;
   concierge: string;
   routeTitle: string;
+  fromCode: string;
   fromCity: string;
+  toCode: string;
   toCity: string;
+  stopoverCode: string;
+  stopoverCity: string;
   stopoverDuration: string;
   arrives: string;
   departs: string;
   terminal: string;
   layover: string;
   today: string;
+  arrivalTime: string;
+  departureTime: string;
+  terminalValue: string;
+  layoverValue: string;
   recommendedTitle: string;
   recommendedBody: string;
   bestValue: string;
   packageName: string;
   packageBadge: string;
+  packagePrice: string;
   lounge: string;
   loungeBody: string;
   cityRoute: string;
@@ -73,7 +83,9 @@ type DashboardCopy = {
   guarantee: string;
   guaranteeBody: string;
   buffer: string;
+  bufferValue: string;
   backBy: string;
+  backByValue: string;
   protection: string;
   protectionBody: string;
   protectionItems: string[];
@@ -105,9 +117,17 @@ const zhCopy: DashboardCopy = {
   help: '需要帮助？',
   concierge: '24/7 中转礼遇助手',
   routeTitle: '中转概览',
-  fromCity: '香港',
-  toCity: '曼谷',
+  fromCode: 'PVG',
+  fromCity: '上海',
+  toCode: 'LHR',
+  toCity: '伦敦',
+  stopoverCode: 'SIN',
+  stopoverCity: '新加坡樟宜',
   stopoverDuration: '中转停留',
+  arrivalTime: '08:30',
+  departureTime: '18:30',
+  terminalValue: 'T1',
+  layoverValue: '10h',
   arrives: '抵达',
   departs: '离境',
   terminal: '航站楼',
@@ -116,47 +136,51 @@ const zhCopy: DashboardCopy = {
   recommendedTitle: '为你推荐',
   recommendedBody: '基于行李托管、返场缓冲和城市体验综合推荐。',
   bestValue: '最佳价值',
-  packageName: '香港 Express 中转套餐',
-  packageBadge: '14h 路线',
+  packageName: '新加坡樟宜经典微游包',
+  packageBadge: '10h PRD 样例',
+  packagePrice: '¥780',
   lounge: '贵宾厅',
-  loungeBody: 'Premium Lounge Access',
+  loungeBody: '2h 休息室信任锚',
   cityRoute: '城市路线',
-  cityRouteBody: '太平山与中环',
+  cityRouteBody: '滨海湾 / 鱼尾狮 / 牛车水',
   baggage: '行李',
   baggageBody: 'RFID 托管',
-  tags: ['6–48 小时', '固定路线', '准时保障', '专属接送'],
+  tags: ['10 小时白天中转', '固定 4h 路线', '起飞前 90min 行李返场', '60min 安检口阈值'],
   priceUnit: '/ 人',
   viewOrder: '查看详情并下单',
   viewPackages: '查看全部套餐',
   baggageJourney: '你的行李旅程',
   viewDetails: '查看详情',
   timeline: [
-    { time: '08:50', title: '已在 HKG T1 接收', body: 'RFID 标签：DP 8847 3092 18', status: '已完成' },
-    { time: '09:10', title: '安全托管中', body: 'DragonPass 行李中心', status: '进行中' },
-    { time: '20:30', title: '准备返还', body: 'HKG T1 · 安检前', status: '' },
-    { time: '22:30', title: '归还给你', body: '登机口交付', status: '' },
+    { time: '08:50', title: '已在 SIN T1 接收', body: 'RFID 标签：DP 8847 3092 18', status: '已完成' },
+    { time: '09:10', title: '贵宾厅托管中', body: '樟宜 T1 环亚贵宾厅行李区', status: '进行中' },
+    { time: '17:00', title: '准备返还', body: '起飞前 90 分钟送往交接点', status: '' },
+    { time: '17:30', title: '安检口阈值', body: '起飞前 60 分钟必须到达', status: '' },
   ],
   routeAssurance: '城市路线与时间保障',
   viewItinerary: '查看行程',
   milestones: [
-    { time: '10:45', title: '太平山', body: '45 分钟' },
-    { time: '12:00', title: '中环', body: '90 分钟' },
-    { time: '13:45', title: 'PMQ 与大馆', body: '60 分钟' },
-    { time: '20:15', title: '返回机场', body: '专车返场' },
+    { time: '09:20', title: '向导接驳', body: '固定车辆' },
+    { time: '10:00', title: '滨海湾花园', body: '地标拍照' },
+    { time: '11:10', title: '鱼尾狮公园', body: '经典动线' },
+    { time: '12:00', title: '牛车水餐食', body: '本地午餐' },
+    { time: '13:00', title: '回到机场', body: '贵宾厅补能' },
   ],
   guarantee: '准时保障',
   guaranteeBody: '返场时间按后续航班倒推，并持续监控交通、天气和运营异常。',
   buffer: '缓冲',
+  bufferValue: '90min',
   backBy: '返场',
+  backByValue: '17:30',
   protection: '误机保护',
   protectionBody: '安心享受中转。若服务链路导致误机，我们负责兜底。',
-  protectionItems: ['改签下一可用航班', '必要时安排酒店住宿', '餐食与本地交通补贴', '最高 HKD 3,000 保障'],
+  protectionItems: ['改签下一可用航班', '必要时安排酒店住宿', '餐食与本地交通补贴', '客服 5 分钟内介入'],
   included: '已包含在套餐中',
   stats: [
-    { value: '4.8/5', label: '服务评分' },
-    { value: '100+', label: '全球机场' },
-    { value: '20M+', label: '服务会员' },
-    { value: '99.2%', label: '准时返场' },
+    { value: '8%', label: '90 天套餐渗透率目标' },
+    { value: '¥450+', label: '单中转客单目标' },
+    { value: '30%', label: '行李托管转化目标' },
+    { value: '3-5', label: 'MVP PoC 枢纽' },
   ],
   askBeforeBook: '预订前还有问题？',
   chatExperts: '咨询中转专家',
@@ -184,9 +208,17 @@ const enCopy: DashboardCopy = {
   help: 'Need help?',
   concierge: '24/7 Concierge',
   routeTitle: 'Stopover overview',
-  fromCity: 'Hong Kong',
-  toCity: 'Bangkok',
+  fromCode: 'PVG',
+  fromCity: 'Shanghai',
+  toCode: 'LHR',
+  toCity: 'London',
+  stopoverCode: 'SIN',
+  stopoverCity: 'Singapore Changi',
   stopoverDuration: 'Stopover Duration',
+  arrivalTime: '08:30',
+  departureTime: '18:30',
+  terminalValue: 'T1',
+  layoverValue: '10h',
   arrives: 'Arrives',
   departs: 'Departs',
   terminal: 'Terminal',
@@ -195,52 +227,56 @@ const enCopy: DashboardCopy = {
   recommendedTitle: 'Recommended for You',
   recommendedBody: 'Curated stopover package with baggage custody and time assurance.',
   bestValue: 'Best Value',
-  packageName: 'Hong Kong Express Stopover',
-  packageBadge: '14h Route',
+  packageName: 'Singapore Classic Micro-Tour',
+  packageBadge: '10h PRD case',
+  packagePrice: '¥780',
   lounge: 'Lounge',
-  loungeBody: 'Premium Lounge Access',
+  loungeBody: '2h lounge anchor',
   cityRoute: 'City Route',
-  cityRouteBody: 'Victoria Peak & Central',
+  cityRouteBody: 'Gardens / Merlion / Chinatown',
   baggage: 'Baggage',
   baggageBody: 'RFID Custody',
-  tags: ['6–48 Hours', 'Fixed Route', 'On-Time Guarantee', 'Private Transfers'],
+  tags: ['10h daytime layover', 'Fixed 4h route', '90min baggage return', '60min security threshold'],
   priceUnit: '/p',
   viewOrder: 'View Details & Order',
   viewPackages: 'View all packages',
   baggageJourney: 'Your Baggage Journey',
   viewDetails: 'View details',
   timeline: [
-    { time: '08:50', title: 'Received at HKG T1', body: 'RFID Tag: DP 8847 3092 18', status: 'Completed' },
-    { time: '09:10', title: 'In Secure Custody', body: 'DragonPass Baggage Center', status: 'In Progress' },
-    { time: '20:30', title: 'Ready for Return', body: 'HKG T1 - Before Security', status: '' },
-    { time: '22:30', title: 'Returned to You', body: 'At Departure Gate', status: '' },
+    { time: '08:50', title: 'Received at SIN T1', body: 'RFID Tag: DP 8847 3092 18', status: 'Completed' },
+    { time: '09:10', title: 'Stored at lounge', body: 'Changi T1 Plaza Premium baggage area', status: 'In Progress' },
+    { time: '17:00', title: 'Ready for return', body: '90 minutes before departure', status: '' },
+    { time: '17:30', title: 'Security threshold', body: 'Must reach security 60 minutes before departure', status: '' },
   ],
   routeAssurance: 'Your City Route & Time Assurance',
   viewItinerary: 'View itinerary',
   milestones: [
-    { time: '10:45', title: 'Victoria Peak', body: '45 min' },
-    { time: '12:00', title: 'Central District', body: '90 min' },
-    { time: '13:45', title: 'PMQ & Tai Kwun', body: '60 min' },
-    { time: '20:15', title: 'Return to Airport', body: 'Private Transfer' },
+    { time: '09:20', title: 'Guide pickup', body: 'Fixed vehicle' },
+    { time: '10:00', title: 'Gardens by the Bay', body: 'Landmark stop' },
+    { time: '11:10', title: 'Merlion Park', body: 'Classic route' },
+    { time: '12:00', title: 'Chinatown meal', body: 'Local lunch' },
+    { time: '13:00', title: 'Back to airport', body: 'Lounge recovery' },
   ],
   guarantee: 'On-Time Guarantee',
   guaranteeBody: 'Traffic, weather, and operations are monitored in real time. If delays occur, we adjust and protect your return.',
   buffer: 'Buffer',
+  bufferValue: '90min',
   backBy: 'Back by',
+  backByValue: '17:30',
   protection: 'Missed-Flight Protection',
   protectionBody: "Relax and enjoy your stopover. We've got your back.",
   protectionItems: [
     'Rebooking on next available flight',
     'Hotel accommodation if needed',
     'Meal & local transport allowance',
-    'Up to HKD 3,000 coverage',
+    'Concierge intervention within 5 minutes',
   ],
   included: 'Included in this package',
   stats: [
-    { value: '4.8/5', label: 'Service Rating' },
-    { value: '100+', label: 'Global Airports' },
-    { value: '20M+', label: 'Members Served' },
-    { value: '99.2%', label: 'On-Time Return' },
+    { value: '8%', label: '90-day package penetration target' },
+    { value: '¥450+', label: 'ARPL target' },
+    { value: '30%', label: 'Baggage custody conversion target' },
+    { value: '3-5', label: 'MVP PoC hubs' },
   ],
   askBeforeBook: 'Questions before you book?',
   chatExperts: 'Chat with our Stopover Experts',
@@ -427,24 +463,29 @@ function RouteSummary({ copy, isDark }: { copy: DashboardCopy; isDark: boolean }
       aria-label={copy.routeTitle}
     >
       <div className="flex min-w-0 items-center justify-between gap-3">
-        <AirportLabel code="HKG" city={copy.fromCity} />
+        <AirportLabel code={copy.fromCode} city={copy.fromCity} />
         <div className="flex min-w-0 flex-1 items-center gap-2 px-0 sm:gap-3 sm:px-4">
           <Plane className={isDark ? 'text-[#89b4ff]' : 'text-[#0b2d62]'} size={24} />
           <div className="relative h-px flex-1 border-t border-dashed border-[#8da0bd]">
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[58%] whitespace-nowrap bg-inherit px-3 text-center text-xs font-semibold">
-              <span className={isDark ? 'hidden text-slate-300 sm:inline' : 'hidden text-[#071632] sm:inline'}>{copy.stopoverDuration}</span>
-              <span className="text-sm font-black text-[#ff6b00] sm:ml-2 sm:text-base">14h 30m</span>
+            <span
+              className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[58%] whitespace-nowrap rounded-full border px-3 py-1 text-center text-xs font-black shadow-sm ${
+                isDark ? 'border-white/10 bg-[#101d31] text-[#ffb366]' : 'border-slate-200 bg-white text-[#ff6b00]'
+              }`}
+            >
+              <span className="text-sm font-black sm:text-base">
+                {copy.stopoverCode} · {copy.layoverValue}
+              </span>
             </span>
           </div>
         </div>
-        <AirportLabel code="BKK" city={copy.toCity} alignRight />
+        <AirportLabel code={copy.toCode} city={copy.toCity} alignRight />
       </div>
 
       <div className={`grid grid-cols-2 rounded-lg border sm:grid-cols-4 ${isDark ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-slate-50'}`}>
-        <FlightStat icon={PlaneLanding} label={copy.arrives} value="09:15" note={copy.today} />
-        <FlightStat icon={PlaneTakeoff} label={copy.departs} value="23:45" note={copy.today} />
-        <FlightStat icon={Building2} label={copy.terminal} value="1" note="" />
-        <FlightStat icon={Clock3} label={copy.layover} value="14h 30m" note="" />
+        <FlightStat icon={PlaneLanding} label={copy.arrives} value={copy.arrivalTime} note={copy.today} />
+        <FlightStat icon={PlaneTakeoff} label={copy.departs} value={copy.departureTime} note={copy.today} />
+        <FlightStat icon={Building2} label={copy.terminal} value={copy.terminalValue} note={copy.stopoverCity} />
+        <FlightStat icon={Clock3} label={copy.layover} value={copy.layoverValue} note={copy.stopoverCode} />
       </div>
     </section>
   );
@@ -507,7 +548,7 @@ function RecommendationCard({ copy, isDark }: { copy: DashboardCopy; isDark: boo
               <h3 className={`text-xl font-black leading-tight ${isDark ? 'text-white' : 'text-[#071632]'}`}>{copy.packageName}</h3>
               <span className={`rounded-lg px-3 py-1 text-xs font-black ${isDark ? 'bg-white/10 text-slate-100' : 'bg-[#eaf1fb] text-[#0f3e86]'}`}>{copy.packageBadge}</span>
             </div>
-            <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
+            <div className="mt-5 grid gap-3 text-sm 2xl:grid-cols-3">
               <Feature icon={Headphones} title={copy.lounge} body={copy.loungeBody} />
               <Feature icon={MapPinned} title={copy.cityRoute} body={copy.cityRouteBody} />
               <Feature icon={Luggage} title={copy.baggage} body={copy.baggageBody} />
@@ -522,7 +563,7 @@ function RecommendationCard({ copy, isDark }: { copy: DashboardCopy; isDark: boo
           </div>
           <div className="flex flex-col gap-3 2xl:flex-row 2xl:items-end 2xl:justify-between">
             <div>
-              <div className="text-2xl font-black">HKD 2,980</div>
+              <div className="text-2xl font-black">{copy.packagePrice}</div>
               <div className="text-xs font-medium opacity-65">{copy.priceUnit}</div>
             </div>
             <Link
@@ -611,8 +652,8 @@ function BaggageJourney({ copy, isDark }: { copy: DashboardCopy; isDark: boolean
 
 function languageAwareAssurance(copy: DashboardCopy) {
   return copy === zhCopy
-    ? '我们会在值机前把行李送回你手上，让你轻装完成中转。'
-    : "We'll return your bag to you before your check-in time. Travel hands-free.";
+    ? `我们会在起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟启动行李返场，并确保你在起飞前 ${STOP_OVER_PRD.securityGateDeadlineMin} 分钟抵达安检口。`
+    : `Baggage return starts ${STOP_OVER_PRD.baggageReturnBufferMin} minutes before departure, with a ${STOP_OVER_PRD.securityGateDeadlineMin}-minute security threshold.`;
 }
 
 function CityRouteCard({ copy, isDark }: { copy: DashboardCopy; isDark: boolean }) {
@@ -627,7 +668,7 @@ function CityRouteCard({ copy, isDark }: { copy: DashboardCopy; isDark: boolean 
       </div>
       <div className="grid gap-4 sm:grid-cols-5">
         <div className="flex items-center justify-between gap-2 sm:col-span-5">
-          <RouteNode icon={Car} label="Depart Airport" />
+          <RouteNode icon={Car} label={copy === zhCopy ? '机场出发' : 'Depart airport'} />
           {copy.milestones.map((item) => (
             <RouteNode key={item.time} icon={item.title.includes('Airport') || item.title.includes('机场') ? Plane : Building2} label={item.title} time={item.time} note={item.body} />
           ))}
@@ -641,8 +682,8 @@ function CityRouteCard({ copy, isDark }: { copy: DashboardCopy; isDark: boolean 
             <div className="mt-1 text-xs font-medium leading-relaxed opacity-65">{copy.guaranteeBody}</div>
           </div>
         </div>
-        <Metric label={copy.buffer} value="3h 30m" />
-        <Metric label={copy.backBy} value="20:15" />
+        <Metric label={copy.buffer} value={copy.bufferValue} />
+        <Metric label={copy.backBy} value={copy.backByValue} />
       </div>
     </section>
   );
@@ -722,14 +763,14 @@ function PhonePreview({ copy }: { copy: DashboardCopy }) {
             </div>
             <div className="rounded-lg bg-[#ffffff] p-4 text-[#071632]">
               <div className="flex items-center justify-between">
-                <AirportLabel code="HKG" city={copy.fromCity} />
+                <AirportLabel code={copy.fromCode} city={copy.fromCity} />
                 <Plane className="text-[#0f3e86]" size={20} />
-                <AirportLabel code="BKK" city={copy.toCity} alignRight />
+                <AirportLabel code={copy.toCode} city={copy.toCity} alignRight />
               </div>
               <div className="mt-4 grid grid-cols-3 gap-2 border-t border-slate-200 pt-3 text-center">
-                <TinyStat label={copy.arrives} value="09:15" />
-                <TinyStat label={copy.departs} value="23:45" />
-                <TinyStat label={copy.terminal} value="1" />
+                <TinyStat label={copy.arrives} value={copy.arrivalTime} />
+                <TinyStat label={copy.departs} value={copy.departureTime} />
+                <TinyStat label={copy.terminal} value={copy.terminalValue} />
               </div>
             </div>
           </div>
@@ -744,7 +785,7 @@ function PhonePreview({ copy }: { copy: DashboardCopy }) {
                 />
                 <div className="min-w-0">
                   <div className="text-sm font-black leading-tight">{copy.packageName}</div>
-                  <div className="mt-2 text-base font-black">HKD 2,980</div>
+                  <div className="mt-2 text-base font-black">{copy.packagePrice}</div>
                   <Link href="/search" className="mt-3 flex h-9 items-center justify-center rounded bg-[#f97316] text-xs font-black text-white">
                     {copy.viewOrder.replace(' & ', ' &\u00a0')}
                   </Link>

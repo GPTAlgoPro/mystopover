@@ -7,6 +7,7 @@ import {
   type ConciergePlan,
   type ConciergeProfile,
 } from '@/lib/conciergeEngine';
+import { STOP_OVER_PRD } from '@/lib/prdRules';
 import type { AddonSku } from '@/lib/types';
 import type { LanguageCode } from '@/lib/appPreferences';
 
@@ -25,17 +26,17 @@ const DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
 const DEFAULT_MODEL = 'qwen3.7-max';
 
 const stopoverKnowledge = [
-  '产品定位：以休息室为信任锚 + 行李全托管 + 模块化城市服务，把 6-48 小时机场等待升级为轻量级目的地体验。',
+  `产品定位：以休息室为信任锚 + 行李全托管 + 模块化城市服务，把 ${STOP_OVER_PRD.productRange.minHours}-${STOP_OVER_PRD.productRange.maxHours} 小时机场等待升级为轻量级目的地体验。`,
   '核心痛点：时间焦虑、行李焦虑、决策焦虑、体验焦虑。',
   'MVP 必须覆盖三档套餐：轻享包、微游包、过夜包。',
   '轻享包：6-8 小时中转，休息室 3h + 行李寄存 + 快速安检，¥260-320。',
   '微游包：10-18 小时白天中转，休息室 2h + 行李全托管 + 城市 4h 游 + 接送 + 误机保障，¥680-880。',
   '过夜包：12-36 小时跨夜中转，休息室 1h + 行李托管 + 酒店/钟点房 + 接送，¥780-1200。',
-  '行李全托管：中转柜台收件，RFID + 拍照登记 + 用户签字，15 分钟内转运至合作贵宾厅/酒店，每件最高 ¥5000 行李险。',
-  '城市微游：固定时段、固定路线、专车 + 中文/英文向导 + 误时保护，原则是景点集中、避开高峰、确保 60 分钟前回到安检口。',
+  `行李全托管：中转柜台收件，RFID + 拍照登记 + 用户签字，${STOP_OVER_PRD.baggageTransferSlaMin} 分钟内转运至合作贵宾厅/酒店，每件最高 ¥${STOP_OVER_PRD.baggageCoverageCny} 行李险。`,
+  `城市微游：固定时段、固定路线、专车 + 中文/英文向导 + 误时保护，原则是景点集中、避开高峰、确保起飞前 ${STOP_OVER_PRD.securityGateDeadlineMin} 分钟到达安检口。`,
   '增值项：eSIM、接送机、酒店钟点房、淋浴/睡眠舱、机场餐饮券、私人包车。',
   'AI 团餐匹配：订票/选套餐时基于停留时段、E/I 社交偏好、能量水平、同行人数和返场缓冲，推荐机场内或城市内团餐；夜间优先安全近距，白天优先本地特色，低能量优先少步行低打扰，高能量可推荐拼团和城市餐食。',
-  '误机保障：如我方城市游/酒店/接送导致登机前 60 分钟未到安检口，自动启动改签协助、酒店餐食赔付，客服 5 分钟内介入。',
+  `误机保障：如我方城市游/酒店/接送导致登机前 ${STOP_OVER_PRD.securityGateDeadlineMin} 分钟未到安检口，自动启动改签协助、酒店餐食赔付，客服 ${STOP_OVER_PRD.conciergeInterventionSlaMin} 分钟内介入；行李返场在起飞前 ${STOP_OVER_PRD.baggageReturnBufferMin} 分钟启动。`,
   '竞品差异：不绑定单一航司，机场内外全链路，行李全托管，3 档套餐 + 增值项，按多枢纽复制。',
   '首个 PoC 枢纽建议新加坡樟宜，中文友好、机场生态成熟、城市路线集中。',
 ].join('\n');
@@ -89,7 +90,7 @@ function buildMessages(
             '如果用户补充了新约束，优先承认并调整口径。',
             '如果 deterministic_plan 已给出 packageName 和 routeName，应使用它，不要编造其他 SKU。',
             '若信息不足，最多问 1 个关键问题，并给出默认推荐。',
-            '涉及行李和误机保障时要给出 RFID、60/90 分钟、最高 ¥5000/件等硬规则。',
+            `涉及行李和误机保障时要给出 RFID、${STOP_OVER_PRD.securityGateDeadlineMin}/${STOP_OVER_PRD.baggageReturnBufferMin} 分钟、最高 ¥${STOP_OVER_PRD.baggageCoverageCny}/件等硬规则。`,
           ],
         },
         null,
